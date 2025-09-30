@@ -75,6 +75,63 @@ class QuestionsOutput(BaseModel):
     technology: str
     candidate_name: str
 
+# Answer Scoring Models
+class CandidateInfo(BaseModel):
+    name: str
+    technology: str
+
+class InterviewQuestion(BaseModel):
+    question_id: int
+    question: str
+    difficulty: str
+    category: str
+    expected_topics: List[str]
+    answer: str
+    time_taken: int
+    max_time_allowed: int
+
+class ScoringInput(BaseModel):
+    candidate_info: CandidateInfo
+    interview_data: List[InterviewQuestion]
+
+class QuestionScore(BaseModel):
+    question_id: int
+    question: str
+    difficulty: str
+    category: str
+    candidate_answer: str
+    time_taken: int
+    max_time_allowed: int
+    content_score: float  # 0-10
+    total_score: float  # 0-10 (same as content_score)
+    feedback: str
+    strengths: List[str]
+    weaknesses: List[str]
+    key_points_covered: List[str]
+    key_points_missed: List[str]
+
+class DifficultyBreakdown(BaseModel):
+    easy: Dict[str, float]
+    medium: Dict[str, float]
+    hard: Dict[str, float]
+
+class FinalScore(BaseModel):
+    content_score: float  # 0-100
+    overall_score: float  # 0-100 (same as content_score)
+
+class ScoringOutput(BaseModel):
+    candidate_name: str
+    technology: str
+    total_questions: int
+    questions_attempted: int
+    question_scores: List[QuestionScore]
+    difficulty_breakdown: DifficultyBreakdown
+    final_score: FinalScore
+    overall_feedback: str
+    recommendation: str
+    strengths_summary: List[str]
+    areas_for_improvement: List[str]
+
 QUESTION_GENERATION_PROMPT = """You are an expert technical interviewer specializing in {technology}. Generate exactly 6 interview questions based on the candidate's resume.
 
 **ABSOLUTE REQUIREMENTS (MUST FOLLOW):**
@@ -144,6 +201,114 @@ QUESTION_GENERATION_PROMPT = """You are an expert technical interviewer speciali
 }}
 
 Remember: Return ONLY valid JSON. Count carefully - exactly 2 easy, 2 medium, 2 hard questions about {technology}."""
+
+# Answer Scoring Prompts
+EVALUATION_PROMPT = """You are an expert technical interviewer evaluating a candidate's answer for a {technology} position.
+
+**Question #{question_id} ({difficulty} - {category}):**
+{question}
+
+**Expected Topics:** {expected_topics}
+
+**Candidate's Answer:**
+{answer}
+
+**Evaluation Instructions:**
+1. Assess the technical accuracy and depth of the answer
+2. Check if expected topics are covered
+3. Evaluate clarity and structure of the response
+4. Consider the difficulty level in your scoring
+5. Be strict but fair - empty or very poor answers should get 0-2 scores
+
+**Scoring Criteria:**
+- **Content Score (0-10):**
+  - 9-10: Excellent, comprehensive, accurate
+  - 7-8: Good understanding, minor gaps
+  - 5-6: Basic understanding, missing key points
+  - 3-4: Partial/incorrect understanding
+  - 0-2: No answer or completely wrong
+
+**Output JSON format:**
+{{
+  "content_score": 7.5,
+  "feedback": "Detailed evaluation of the answer...",
+  "strengths": ["specific strength 1", "specific strength 2"],
+  "weaknesses": ["specific weakness 1", "specific weakness 2"],
+  "key_points_covered": ["point1", "point2"],
+  "key_points_missed": ["point1", "point2"]
+}}
+
+Evaluate now:"""
+
+OVERALL_SUMMARY_PROMPT = """Based on the complete interview evaluation, provide an overall assessment.
+
+**Candidate:** {candidate_name}
+**Technology:** {technology}
+**Overall Score:** {overall_score}/100
+
+**Performance Breakdown:**
+{performance_breakdown}
+
+**Difficulty-wise Performance:**
+- Easy Questions: {easy_avg}/10
+- Medium Questions: {medium_avg}/10
+- Hard Questions: {hard_avg}/10
+
+Provide a JSON response:
+{{
+  "overall_feedback": "2-3 sentences summarizing overall performance",
+  "recommendation": "strong-hire/hire/conditional-hire/no-hire",
+  "strengths_summary": ["key strength 1", "key strength 2", "key strength 3"],
+  "areas_for_improvement": ["area 1", "area 2", "area 3"]
+}}
+
+**Recommendation Guidelines:**
+- strong-hire: 80-100, excellent across all difficulties
+- hire: 65-79, good performance with minor gaps
+- conditional-hire: 50-64, basic understanding, needs improvement
+- no-hire: below 50, insufficient knowledge
+
+Generate the summary:"""
+
+def is_answer_valid(answer: str) -> bool:
+    """Check if answer is meaningful (not gibberish)"""
+    if not answer or len(answer.strip()) < 5:
+        return False
+    
+    # Check for gibberish (repeated characters, no spaces, etc.)
+    words = answer.strip().split()
+    if len(words) < 2:
+        return False
+    
+    # Check if it's mostly random characters
+    alpha_count = sum(c.isalpha() for c in answer)
+    if alpha_count < len(answer) * 0.7:
+        return False
+    
+    return True
+
+def extract_json_from_response(content: str) -> dict:
+    """Extract JSON from LLM response, handling various formats"""
+    try:
+        return json.loads(content)
+    except json.JSONDecodeError:
+        # Try to extract from markdown code blocks
+        json_match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', content, re.DOTALL)
+        if json_match:
+            try:
+                return json.loads(json_match.group(1))
+            except:
+                pass
+        
+        # Try to find any JSON object
+        json_match = re.search(r'\{.*\}', content, re.DOTALL)
+        if json_match:
+            try:
+                return json.loads(json_match.group(0))
+            except:
+                pass
+    
+    return None
 
 def create_resume_summary(resume_data: Dict[str, Any], technology: str = "") -> str:
     """Create a focused summary of the resume highlighting relevant tech experience"""
@@ -415,9 +580,9 @@ def normalize_resume_data(data: dict) -> dict:
 @app.get("/")
 async def root():
     return {
-        "message": "Resume Parser & Question Generation API", 
+        "message": "Resume Parser, Question Generation & Answer Scoring API", 
         "status": "running",
-        "endpoints": ["/parse-resume", "/generate-questions", "/health"]
+        "endpoints": ["/parse-resume", "/generate-questions", "/score-answers", "/health"]
     }
 
 @app.post("/parse-resume")
@@ -613,6 +778,188 @@ async def generate_questions(resume_input: ResumeInput):
             detail=f"Error generating questions: {str(e)}"
         )
 
+@app.post("/score-answers", response_model=ScoringOutput)
+async def score_answers(scoring_input: ScoringInput):
+    """
+    Score candidate's interview answers with detailed evaluation
+    """
+    if not GROQ_API_KEY:
+        raise HTTPException(status_code=500, detail="GROQ_API_KEY not configured")
+    
+    if not scoring_input.interview_data:
+        raise HTTPException(status_code=400, detail="No interview data provided")
+    
+    try:
+        llm = ChatGroq(api_key=GROQ_API_KEY, model="llama-3.3-70b-versatile", temperature=0.3)
+        question_scores = []
+        questions_attempted = 0
+        
+        # Evaluate each question
+        for qa in scoring_input.interview_data:
+            # Check if answer is valid
+            answer_valid = is_answer_valid(qa.answer)
+            
+            if not answer_valid:
+                # Auto-score for invalid/gibberish answers
+                question_score = QuestionScore(
+                    question_id=qa.question_id,
+                    question=qa.question,
+                    difficulty=qa.difficulty,
+                    category=qa.category,
+                    candidate_answer=qa.answer,
+                    time_taken=qa.time_taken,
+                    max_time_allowed=qa.max_time_allowed,
+                    content_score=0.0,
+                    total_score=0.0,  # Same as content_score
+                    feedback="Invalid or incomplete answer provided. The response appears to be gibberish or too short to evaluate.",
+                    strengths=[],
+                    weaknesses=["No meaningful answer provided", "Appears to be random text"],
+                    key_points_covered=[],
+                    key_points_missed=qa.expected_topics
+                )
+                question_scores.append(question_score)
+                continue
+            
+            questions_attempted += 1
+            
+            # Generate evaluation prompt
+            prompt = EVALUATION_PROMPT.format(
+                technology=scoring_input.candidate_info.technology,
+                question_id=qa.question_id,
+                difficulty=qa.difficulty,
+                category=qa.category,
+                question=qa.question,
+                expected_topics=", ".join(qa.expected_topics),
+                answer=qa.answer
+            )
+            
+            # Get evaluation from LLM
+            response = llm.invoke(prompt)
+            eval_data = extract_json_from_response(response.content)
+            
+            if not eval_data:
+                # Fallback evaluation
+                eval_data = {
+                    "content_score": 5.0,
+                    "feedback": "Could not parse evaluation properly. Manual review recommended.",
+                    "strengths": [],
+                    "weaknesses": ["Evaluation parsing failed"],
+                    "key_points_covered": [],
+                    "key_points_missed": qa.expected_topics
+                }
+            
+            # Calculate scores (content only)
+            content_score = float(eval_data.get("content_score", 5.0))
+            
+            # Total score is same as content score
+            total_score = content_score
+            
+            question_score = QuestionScore(
+                question_id=qa.question_id,
+                question=qa.question,
+                difficulty=qa.difficulty,
+                category=qa.category,
+                candidate_answer=qa.answer,
+                time_taken=qa.time_taken,
+                max_time_allowed=qa.max_time_allowed,
+                content_score=round(content_score, 2),
+                total_score=round(total_score, 2),
+                feedback=eval_data.get("feedback", ""),
+                strengths=eval_data.get("strengths", []),
+                weaknesses=eval_data.get("weaknesses", []),
+                key_points_covered=eval_data.get("key_points_covered", []),
+                key_points_missed=eval_data.get("key_points_missed", [])
+            )
+            question_scores.append(question_score)
+        
+        # Calculate difficulty breakdown
+        difficulty_scores = {"easy": [], "medium": [], "hard": []}
+        
+        for score in question_scores:
+            diff = score.difficulty.lower()
+            if diff in difficulty_scores:
+                difficulty_scores[diff].append(score.content_score)
+        
+        difficulty_breakdown = DifficultyBreakdown(
+            easy={
+                "avg_content_score": round(sum(difficulty_scores["easy"]) / len(difficulty_scores["easy"]), 2) if difficulty_scores["easy"] else 0.0,
+                "count": len(difficulty_scores["easy"])
+            },
+            medium={
+                "avg_content_score": round(sum(difficulty_scores["medium"]) / len(difficulty_scores["medium"]), 2) if difficulty_scores["medium"] else 0.0,
+                "count": len(difficulty_scores["medium"])
+            },
+            hard={
+                "avg_content_score": round(sum(difficulty_scores["hard"]) / len(difficulty_scores["hard"]), 2) if difficulty_scores["hard"] else 0.0,
+                "count": len(difficulty_scores["hard"])
+            }
+        )
+        
+        # Calculate final scores
+        all_content_scores = [s.content_score for s in question_scores]
+        
+        content_score_avg = sum(all_content_scores) / len(all_content_scores)
+        
+        # Convert to 0-100 scale
+        content_score_100 = round((content_score_avg / 10) * 100, 2)
+        
+        # Overall score is same as content score
+        overall_score = content_score_100
+        
+        final_score = FinalScore(
+            content_score=content_score_100,
+            overall_score=overall_score
+        )
+        
+        # Generate overall summary
+        performance_breakdown = "\n".join([
+            f"Q{s.question_id} ({s.difficulty}): {s.total_score}/10"
+            for s in question_scores
+        ])
+        
+        summary_prompt = OVERALL_SUMMARY_PROMPT.format(
+            candidate_name=scoring_input.candidate_info.name,
+            technology=scoring_input.candidate_info.technology,
+            overall_score=overall_score,
+            performance_breakdown=performance_breakdown,
+            easy_avg=difficulty_breakdown.easy["avg_content_score"],
+            medium_avg=difficulty_breakdown.medium["avg_content_score"],
+            hard_avg=difficulty_breakdown.hard["avg_content_score"]
+        )
+        
+        summary_response = llm.invoke(summary_prompt)
+        summary_data = extract_json_from_response(summary_response.content)
+        
+        if not summary_data:
+            summary_data = {
+                "overall_feedback": f"Candidate scored {overall_score}/100 overall.",
+                "recommendation": "conditional-hire" if overall_score >= 50 else "no-hire",
+                "strengths_summary": ["Requires manual review"],
+                "areas_for_improvement": ["Requires manual review"]
+            }
+        
+        return ScoringOutput(
+            candidate_name=scoring_input.candidate_info.name,
+            technology=scoring_input.candidate_info.technology,
+            total_questions=len(scoring_input.interview_data),
+            questions_attempted=questions_attempted,
+            question_scores=question_scores,
+            difficulty_breakdown=difficulty_breakdown,
+            final_score=final_score,
+            overall_feedback=summary_data.get("overall_feedback", ""),
+            recommendation=summary_data.get("recommendation", "conditional-hire"),
+            strengths_summary=summary_data.get("strengths_summary", []),
+            areas_for_improvement=summary_data.get("areas_for_improvement", [])
+        )
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error scoring answers: {str(e)}"
+        )
+
 @app.get("/health")
 async def health_check():
     return {
@@ -623,4 +970,4 @@ async def health_check():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8002)
