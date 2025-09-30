@@ -1,12 +1,16 @@
-# Resume Parser API
+# Resume Parser & Question Generation API
 
-A FastAPI-powered resume parsing service that extracts structured information from PDF and text files using Groq AI.
+A comprehensive FastAPI-powered service that:
+1. **Parses resumes** - extracts structured information from PDF and text files
+2. **Generates interview questions** - creates tailored technical questions based on resume data
 
 ## Features
 
 - 📄 Parse PDF and TXT resume files
-- 🤖 AI-powered extraction using Groq's Llama model
+- 🤖 AI-powered extraction using Groq's Llama models
 - 🔄 Structured JSON output with personal info and professional details
+- ❓ Generate 6 tailored interview questions (2 easy, 2 medium, 2 hard)
+- 🎯 Technology-specific questions (React.js, Node.js)
 - 🔒 Input validation and security features
 - 📚 Interactive API documentation
 - 🌐 CORS enabled for web integration
@@ -86,6 +90,48 @@ Check API health and configuration status.
 {
   "status": "healthy",
   "groq_key_configured": true
+}
+```
+
+### `POST /generate-questions`
+Generate 6 tailored interview questions based on parsed resume data.
+
+**Request:**
+- Method: `POST`
+- Content-Type: `application/json`
+- Body:
+```json
+{
+  "personal_info": {
+    "name": "John Doe",
+    "email": "john.doe@email.com",
+    // ... other personal info
+  },
+  "other_info": {
+    "education": [...],
+    "experience": [...],
+    "projects": [...],
+    // ... other resume data
+  },
+  "technology": "reactjs"  // or "nodejs"
+}
+```
+
+**Response:**
+```json
+{
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is the difference between React functional and class components?",
+      "difficulty": "easy",
+      "category": "fundamentals",
+      "expected_topics": ["react.js", "basics"]
+    }
+    // ... 5 more questions (2 easy, 2 medium, 2 hard)
+  ],
+  "technology": "React.js",
+  "candidate_name": "John Doe"
 }
 ```
 

@@ -1,5 +1,7 @@
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from typing import Dict, Any, List, Optional
 import os
 import json
 import tempfile
@@ -20,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 load_dotenv()
 
-app = FastAPI(title="Resume Parser API", version="1.0.0")
+app = FastAPI(title="Resume Parser & Question Generation API", version="1.0.0")
 
 # Add CORS middleware
 app.add_middleware(
@@ -34,6 +36,14 @@ app.add_middleware(
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 MODEL = "llama-3.1-8b-instant"
 
+# Supported models for question generation with fallback
+SUPPORTED_MODELS = [
+    "llama-3.1-8b-instant",
+    "llama-3.2-3b-preview", 
+    "mixtral-8x7b-32768",
+    "gemma2-9b-it"
+]
+
 PROMPT = '''Extract all possible candidate information from the following resume. You MUST return ONLY a valid JSON object with no additional text, explanations, or markdown formatting.
 
 The JSON must have exactly two top-level keys:
@@ -46,6 +56,202 @@ Resume:
 """
 
 Return only the JSON object (no markdown, no explanations):'''
+
+# Pydantic models for question generation
+class ResumeInput(BaseModel):
+    personal_info: Dict[str, Any]
+    other_info: Dict[str, Any]
+    technology: str = "reactjs"  # or "nodejs"
+
+class Question(BaseModel):
+    id: int
+    question: str
+    difficulty: str
+    category: str
+    expected_topics: List[str]
+
+class QuestionsOutput(BaseModel):
+    questions: List[Question]
+    technology: str
+    candidate_name: str
+
+QUESTION_GENERATION_PROMPT = """You are an expert technical interviewer specializing in {technology}. Generate exactly 6 interview questions based on the candidate's resume.
+
+**ABSOLUTE REQUIREMENTS (MUST FOLLOW):**
+✓ EXACTLY 2 questions with difficulty: "easy"
+✓ EXACTLY 2 questions with difficulty: "medium"  
+✓ EXACTLY 2 questions with difficulty: "hard"
+✓ All 6 questions MUST focus on {technology}
+✓ Reference candidate's {technology} experience/projects from resume when possible
+✓ Use realistic scenarios based on their background
+
+**Question Strategy:**
+- EASY (2 questions): Core concepts, syntax, basic understanding
+- MEDIUM (2 questions): Practical implementation, debugging, best practices, specific to their project experience
+- HARD (2 questions): Architecture decisions, complex scenarios, system design related to their work
+
+**Candidate Background:**
+{resume_summary}
+
+**Your Task:** Create 6 {technology} interview questions that test different skill levels. If the candidate has {technology} projects or experience mentioned above, create questions that relate to those specific projects or technologies they've used.
+
+**EXACT OUTPUT FORMAT (JSON only, no other text):**
+{{
+  "questions": [
+    {{
+      "id": 1,
+      "question": "Easy {technology} question here?",
+      "difficulty": "easy",
+      "category": "fundamentals",
+      "expected_topics": ["{technology_lower}", "basics"]
+    }},
+    {{
+      "id": 2, 
+      "question": "Second easy {technology} question here?",
+      "difficulty": "easy",
+      "category": "fundamentals", 
+      "expected_topics": ["{technology_lower}", "concepts"]
+    }},
+    {{
+      "id": 3,
+      "question": "Medium {technology} question here?", 
+      "difficulty": "medium",
+      "category": "best-practices",
+      "expected_topics": ["{technology_lower}", "implementation"]
+    }},
+    {{
+      "id": 4,
+      "question": "Second medium {technology} question here?",
+      "difficulty": "medium", 
+      "category": "debugging",
+      "expected_topics": ["{technology_lower}", "problem-solving"]
+    }},
+    {{
+      "id": 5,
+      "question": "Hard {technology} question here?",
+      "difficulty": "hard",
+      "category": "system-design", 
+      "expected_topics": ["{technology_lower}", "architecture"]
+    }},
+    {{
+      "id": 6,
+      "question": "Second hard {technology} question here?",
+      "difficulty": "hard",
+      "category": "design-patterns",
+      "expected_topics": ["{technology_lower}", "advanced"]
+    }}
+  ]
+}}
+
+Remember: Return ONLY valid JSON. Count carefully - exactly 2 easy, 2 medium, 2 hard questions about {technology}."""
+
+def create_resume_summary(resume_data: Dict[str, Any], technology: str = "") -> str:
+    """Create a focused summary of the resume highlighting relevant tech experience"""
+    summary_parts = []
+    
+    # Personal info
+    personal = resume_data.get("personal_info", {})
+    name = personal.get("name", "Unknown")
+    summary_parts.append(f"Candidate: {name}")
+    
+    # Education
+    other_info = resume_data.get("other_info", {})
+    education = other_info.get("education", [])
+    if education:
+        edu_summary = []
+        for edu in education[:2]:
+            if isinstance(edu, dict):
+                degree = edu.get("degree", "")
+                institution = edu.get("institution", "")
+                if degree or institution:
+                    edu_summary.append(f"{degree} from {institution}")
+        if edu_summary:
+            summary_parts.append(f"Education: {'; '.join(edu_summary)}")
+    
+    # Experience - Focus on tech-relevant roles
+    experience = other_info.get("experience", [])
+    if experience:
+        tech_keywords = ["react", "node", "javascript", "frontend", "backend", "full-stack", "developer", "engineer"]
+        relevant_exp = []
+        
+        for exp in experience[:3]:
+            if isinstance(exp, dict):
+                role_raw = exp.get("role", exp.get("title", ""))
+                role = str(role_raw).lower() if role_raw else ""
+                company_raw = exp.get("company", "")
+                company = str(company_raw) if company_raw else ""
+                description_raw = exp.get("description", "")
+                description = str(description_raw).lower() if description_raw else ""
+                
+                # Check if experience is tech-related
+                is_relevant = any(keyword in role or keyword in description for keyword in tech_keywords)
+                
+                if is_relevant or not relevant_exp:  # Include first experience even if not explicitly tech
+                    role_display = str(role_raw) if role_raw else ""
+                    if role_display:
+                        relevant_exp.append(f"{role_display} at {company}")
+        
+        if relevant_exp:
+            summary_parts.append(f"Relevant Experience: {'; '.join(relevant_exp)}")
+    
+    # Projects - Highlight React/Node.js projects
+    projects = other_info.get("projects", [])
+    if projects:
+        tech_projects = []
+        other_projects = []
+        
+        for proj in projects:
+            if isinstance(proj, dict):
+                title_raw = proj.get("title", proj.get("name", ""))
+                title = str(title_raw) if title_raw else ""
+                description_raw = proj.get("description", "")
+                description = str(description_raw).lower() if description_raw else ""
+                technologies = proj.get("technologies", [])
+                
+                if isinstance(technologies, list):
+                    # Convert all items to string before joining
+                    tech_text = " ".join(str(tech) for tech in technologies).lower()
+                else:
+                    tech_text = str(technologies).lower() if technologies else ""
+                
+                # Check if project uses relevant technology
+                search_text = f"{description} {tech_text}".lower()
+                tech_match = any(tech in search_text for tech in ["react", "node", "javascript", "js", "frontend", "backend"])
+                
+                if tech_match:
+                    tech_projects.append(f"{title} (uses relevant technology)")
+                elif title:
+                    other_projects.append(title)
+        
+        # Prioritize tech-relevant projects
+        display_projects = tech_projects[:2] + other_projects[:2]
+        if display_projects:
+            summary_parts.append(f"Key Projects: {'; '.join(display_projects[:3])}")
+    
+    # Skills - Highlight relevant technical skills
+    extra_info = other_info.get("extra_info", {})
+    skills = extra_info.get("skills", [])
+    if skills and isinstance(skills, list):
+        # Prioritize relevant skills
+        relevant_skills = []
+        other_skills = []
+        
+        priority_skills = ["react", "node", "javascript", "typescript", "html", "css", "redux", "express", "mongodb", "sql"]
+        
+        for skill in skills:
+            skill_str = str(skill) if skill else ""
+            skill_lower = skill_str.lower()
+            if any(priority in skill_lower for priority in priority_skills):
+                relevant_skills.append(skill_str)
+            else:
+                other_skills.append(skill_str)
+        
+        # Show relevant skills first, then others
+        display_skills = relevant_skills[:8] + other_skills[:4]
+        if display_skills:
+            summary_parts.append(f"Technical Skills: {', '.join(display_skills[:10])}")
+    
+    return "\n".join(summary_parts)
 
 def extract_text_from_pdf(file_content: bytes) -> str:
     """Extract text from PDF file"""
@@ -208,7 +414,11 @@ def normalize_resume_data(data: dict) -> dict:
 
 @app.get("/")
 async def root():
-    return {"message": "Resume Parser API", "status": "running"}
+    return {
+        "message": "Resume Parser & Question Generation API", 
+        "status": "running",
+        "endpoints": ["/parse-resume", "/generate-questions", "/health"]
+    }
 
 @app.post("/parse-resume")
 async def parse_resume(file: UploadFile = File(...)):
@@ -297,9 +507,119 @@ async def parse_resume(file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing resume: {str(e)}")
 
+@app.post("/generate-questions", response_model=QuestionsOutput)
+async def generate_questions(resume_input: ResumeInput):
+    """
+    Generate 6 interview questions based on resume and technology stack
+    """
+    if not GROQ_API_KEY:
+        raise HTTPException(status_code=500, detail="GROQ_API_KEY not configured")
+    
+    try:
+        # Create resume summary with technology focus
+        resume_data = {
+            "personal_info": resume_input.personal_info,
+            "other_info": resume_input.other_info
+        }
+        resume_summary = create_resume_summary(resume_data, resume_input.technology)
+        
+        # Format technology name
+        tech_display = "React.js" if resume_input.technology.lower() == "reactjs" else "Node.js"
+        
+        # Generate prompt
+        prompt = QUESTION_GENERATION_PROMPT.format(
+            resume_summary=resume_summary,
+            technology=tech_display,
+            technology_lower=tech_display.lower()
+        )
+        
+        # Call LLM with fallback models
+        response = None
+        last_error = None
+        
+        for model_name in SUPPORTED_MODELS:
+            try:
+                llm = ChatGroq(api_key=GROQ_API_KEY, model=model_name, temperature=0.7)
+                response = llm.invoke(prompt)
+                break  # Success, exit the loop
+            except Exception as e:
+                last_error = e
+                if "decommissioned" in str(e) or "model" in str(e).lower():
+                    continue  # Try next model
+                else:
+                    raise  # Re-raise if it's not a model issue
+        
+        if response is None:
+            raise HTTPException(
+                status_code=500,
+                detail=f"All models failed. Last error: {str(last_error)}"
+            )
+        
+        # Parse JSON response
+        try:
+            # Try direct JSON parse
+            questions_data = json.loads(response.content)
+        except json.JSONDecodeError:
+            # Try to extract JSON from markdown code blocks
+            json_match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', response.content, re.DOTALL)
+            if json_match:
+                questions_data = json.loads(json_match.group(1))
+            else:
+                # Try to find any JSON object
+                json_match = re.search(r'\{.*\}', response.content, re.DOTALL)
+                if json_match:
+                    questions_data = json.loads(json_match.group(0))
+                else:
+                    raise HTTPException(
+                        status_code=500,
+                        detail="Could not parse questions from LLM response"
+                    )
+        
+        # Validate we have 6 questions
+        questions = questions_data.get("questions", [])
+        if len(questions) != 6:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Expected 6 questions, got {len(questions)}"
+            )
+        
+        # Count difficulty levels and validate distribution
+        difficulty_count = {"easy": 0, "medium": 0, "hard": 0}
+        for q in questions:
+            diff = q.get("difficulty", "").lower()
+            if diff in difficulty_count:
+                difficulty_count[diff] += 1
+        
+        # Log the difficulty distribution for debugging
+        expected_distribution = {"easy": 2, "medium": 2, "hard": 2}
+        if difficulty_count != expected_distribution:
+            logger.warning(f"Expected {expected_distribution}, got {difficulty_count}")
+        
+        # Get candidate name
+        candidate_name = resume_input.personal_info.get("name", "Unknown")
+        
+        return QuestionsOutput(
+            questions=questions,
+            technology=tech_display,
+            candidate_name=candidate_name
+        )
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error generating questions: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error generating questions: {str(e)}"
+        )
+
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "groq_key_configured": bool(GROQ_API_KEY)}
+    return {
+        "status": "healthy", 
+        "groq_key_configured": bool(GROQ_API_KEY),
+        "models_available": SUPPORTED_MODELS[0]
+    }
 
 if __name__ == "__main__":
     import uvicorn
