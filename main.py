@@ -12,6 +12,8 @@ import copy
 import PyPDF2
 from io import BytesIO
 import logging
+from docx import Document
+import zipfile
 
 # Configure logging
 logging.basicConfig(
@@ -430,6 +432,45 @@ def extract_text_from_pdf(file_content: bytes) -> str:
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error extracting PDF text: {str(e)}")
 
+def extract_text_from_docx(file_content: bytes) -> str:
+    """Extract text from DOCX file"""
+    try:
+        docx_file = BytesIO(file_content)
+        doc = Document(docx_file)
+        text = ""
+        for paragraph in doc.paragraphs:
+            text += paragraph.text + "\n"
+        return text
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error extracting DOCX text: {str(e)}")
+
+def extract_text_from_doc(file_content: bytes) -> str:
+    """Extract text from DOC file (legacy Word format)"""
+    try:
+        # For .doc files, we'll try a basic approach using zipfile
+        # Note: This is a simplified approach and may not work for all .doc files
+        # For production use, consider using python-docx2txt or antiword
+        try:
+            doc_file = BytesIO(file_content)
+            with zipfile.ZipFile(doc_file, 'r') as zip_file:
+                xml_content = zip_file.read('word/document.xml')
+                # Basic XML parsing to extract text (simplified)
+                import xml.etree.ElementTree as ET
+                root = ET.fromstring(xml_content)
+                text = ""
+                for elem in root.iter():
+                    if elem.text:
+                        text += elem.text + " "
+                return text
+        except:
+            # Fallback: treat as binary and try to extract readable text
+            text_content = file_content.decode('utf-8', errors='ignore')
+            # Remove control characters and keep only readable text
+            readable_text = ''.join(char for char in text_content if char.isprintable() or char.isspace())
+            return readable_text
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error extracting DOC text: {str(e)}. Consider converting to DOCX format for better compatibility.")
+
 def get_val(d, keys):
     for k in keys:
         v = d.get("personal_info", {}).get(k) or d.get(k)
@@ -599,15 +640,20 @@ async def parse_resume(file: UploadFile = File(...)):
         raise HTTPException(status_code=400, detail="File size too large. Maximum size is 10MB")
     
     # Validate file type
-    allowed_types = ["application/pdf", "text/plain"]
-    allowed_extensions = [".pdf", ".txt"]
+    allowed_types = [
+        "application/pdf", 
+        "text/plain",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",  # .docx
+        "application/msword"  # .doc
+    ]
+    allowed_extensions = [".pdf", ".txt", ".docx", ".doc"]
     
     if file.content_type not in allowed_types:
-        raise HTTPException(status_code=400, detail="Only PDF and TXT files are supported")
+        raise HTTPException(status_code=400, detail="Only PDF, TXT, DOCX, and DOC files are supported")
     
     # Additional validation by file extension
     if not any(file.filename.lower().endswith(ext) for ext in allowed_extensions):
-        raise HTTPException(status_code=400, detail="File must have .pdf or .txt extension")
+        raise HTTPException(status_code=400, detail="File must have .pdf, .txt, .docx, or .doc extension")
     
     logger.info(f"Processing file: {file.filename}, size: {file.size}, type: {file.content_type}")
     
@@ -618,7 +664,11 @@ async def parse_resume(file: UploadFile = File(...)):
         # Extract text based on file type
         if file.content_type == "application/pdf":
             resume_text = extract_text_from_pdf(file_content)
-        else:
+        elif file.content_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+            resume_text = extract_text_from_docx(file_content)
+        elif file.content_type == "application/msword":
+            resume_text = extract_text_from_doc(file_content)
+        else:  # text/plain
             resume_text = file_content.decode('utf-8')
         
         if not resume_text.strip():

@@ -4,5 +4,6 @@ python-multipart==0.0.20
 langchain-groq==0.2.1
 python-dotenv==1.0.1
 PyPDF2==3.0.1
+python-docx==1.1.2
 pydantic==2.10.3
 annotated-types==0.7.0
