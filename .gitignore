@@ -25,4 +25,10 @@ Thumbs.db
 # Test files
 uploads/
 *.pdf
-*.txt
+
+# Ignore uploaded text files but keep important project files
+test_*.txt
+sample_*.txt
+upload_*.txt
+
+# Note: requirements.txt and other important .txt files are NOT ignored
