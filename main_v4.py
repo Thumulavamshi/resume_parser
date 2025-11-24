@@ -14,7 +14,6 @@ from typing import Dict, List, Optional
 import os
 import json
 import re
-import random
 from langchain_groq import ChatGroq
 from dotenv import load_dotenv
 import PyPDF2
@@ -547,99 +546,9 @@ def create_structured_resume_context(resume_data: dict) -> dict:
     
     return context
 
-def calculate_resume_richness(ctx: dict) -> dict:
-    """Calculate weights and richness scores for resume sections."""
-    weights = {
-        "experience": 0,
-        "projects": 0,
-        "certifications": 0,
-        "achievements": 0
-    }
-    
-    # Experience weight
-    for comp in ctx.get("companies", []):
-        weights["experience"] += 1
-        if comp.get("technologies"): weights["experience"] += 1
-        if comp.get("role"): weights["experience"] += 0.5
-    
-    # Project weight
-    for proj in ctx.get("projects", []):
-        weights["projects"] += 1
-        if proj.get("technologies") and len(proj.get("technologies", [])) > 0: weights["projects"] += 1
-        if proj.get("role"): weights["projects"] += 1
-        if proj.get("description") and len(proj.get("description", "")) > 50: weights["projects"] += 1
-    
-    # Certification weight
-    for cert in ctx.get("certifications", []):
-        weights["certifications"] += 1
-        if cert.get("issuer"): weights["certifications"] += 0.5
-    
-    # Achievement weight
-    weights["achievements"] = len(ctx.get("achievements", []))
-    
-    total_richness = sum(weights.values())
-    primary_section = max(weights, key=weights.get) if weights else "projects"
-    
-    return {
-        "weights": weights,
-        "total_richness": total_richness,
-        "primary_section": primary_section
-    }
-
-def education_is_significant(edu: dict) -> bool:
-    """Check if education section is worth asking about."""
-    if not edu:
-        return False
-    
-    # Check CGPA/GPA
-    grade_str = str(edu.get("grade", "")).lower()
-    try:
-        if "cgpa" in grade_str or "gpa" in grade_str:
-            # Extract numeric value
-            import re
-            nums = re.findall(r'\d+\.?\d*', grade_str)
-            if nums and float(nums[0]) >= 8.0:
-                return True
-    except:
-        pass
-    
-    # Check degree level
-    degree = str(edu.get("degree", "")).lower()
-    if any(term in degree for term in ["masters", "master", "phd", "doctorate", "m.tech", "m.s"]):
-        return True
-    
-    # Check for research or specialization
-    desc = str(edu.get("field_of_study", "") or "").lower()
-    achievements = str(edu.get("achievements", "") or "").lower()
-    combined = desc + " " + achievements
-    
-    if any(term in combined for term in ["research", "specialization", "thesis", "publication"]):
-        return True
-    
-    return False
-
-def get_question_starters() -> List[str]:
-    """Return varied question starters to avoid repetition."""
-    return [
-        "What was your approach to",
-        "How did you handle",
-        "Can you explain",
-        "What challenges did you face in",
-        "Walk me through",
-        "Can you describe",
-        "Tell me about",
-        "How did you manage",
-        "What was your role in"
-    ]
-
 def fill_placeholders_or_drop(q_text: str, resume_context: dict) -> Optional[str]:
     """Replace bracketed placeholders with resume values or return None if unavailable."""
     matches = PLACEHOLDER_RE.findall(q_text)
-    
-    # Fix #3: If multiple placeholders, drop question to avoid incorrect pairing
-    if len(matches) > 1:
-        return None
-    
     out = q_text
     for m in matches:
         token = m.strip().lower()
@@ -706,24 +615,21 @@ def validate_questions_against_resume(questions: List[dict], resume_context: dic
             is_valid = False
             failure_reason = f"Contains placeholder: {q.get('question')}"
         
-        # Check for hallucinated companies (Fix #4: improved detection)
+        # Check for hallucinated companies
         for hallucinated in hallucinated_companies:
-            if hallucinated in question_lower:
-                # Check if this hallucinated name is NOT in valid companies
-                if not any(hallucinated in valid_comp for valid_comp in valid_companies):
-                    is_valid = False
-                    failure_reason = f"Hallucinated company '{hallucinated}' not in resume"
-                    break
+            if hallucinated in question_lower and hallucinated not in valid_companies:
+                is_valid = False
+                failure_reason = f"Hallucinated company '{hallucinated}' not in resume"
+                break
         
-        # Check for hallucinated institutions (Fix #4: improved detection)
+        # Check for hallucinated institutions
         for hallucinated in hallucinated_institutions:
-            if hallucinated in question_lower:
-                # Only flag if it's being asked about specifically AND not in valid institutions
-                if not any(hallucinated in valid_inst for valid_inst in valid_institutions):
-                    if f"at {hallucinated}" in question_lower or f"from {hallucinated}" in question_lower:
-                        is_valid = False
-                        failure_reason = f"Hallucinated institution '{hallucinated}' not in resume"
-                        break
+            if hallucinated in question_lower and hallucinated not in valid_institutions:
+                # Only flag if it's being asked about specifically
+                if f"at {hallucinated}" in question_lower or f"from {hallucinated}" in question_lower:
+                    is_valid = False
+                    failure_reason = f"Hallucinated institution '{hallucinated}' not in resume"
+                    break
         
         # Check for hallucinated projects (generic names)
         generic_projects = ['android app', 'e-commerce', 'chat app', 'weather app', 
@@ -744,49 +650,8 @@ def validate_questions_against_resume(questions: List[dict], resume_context: dic
 
 def deterministic_questions_from_context(ctx: dict, total: int = 7) -> List[dict]:
     """Generate questions deterministically from resume context without LLM.
-    This is a 100% resume-grounded fallback when LLM fails or produces insufficient questions.
-    
-    Improvements:
-    - Dynamic question allocation based on resume richness
-    - Varied question phrasing
-    - Specific technology mentions
-    - Ongoing project detection
-    - Education significance check
-    - No negative framing
-    - Shuffled items for variation (Fix #2)
-    """
+    This is a 100% resume-grounded fallback when LLM fails or produces insufficient questions."""
     qlist = []
-    starters = get_question_starters()
-    
-    # Fix #2: Shuffle items to provide variation across interviews
-    # Make copies to avoid modifying original context
-    companies = ctx.get("companies", [])[:]
-    projects = ctx.get("projects", [])[:]
-    certifications = ctx.get("certifications", [])[:]
-    achievements = ctx.get("achievements", [])[:]
-    
-    random.shuffle(companies)
-    random.shuffle(projects)
-    if certifications:
-        random.shuffle(certifications)
-    if achievements:
-        random.shuffle(achievements)
-    
-    # Calculate resume richness and determine question distribution
-    richness_data = calculate_resume_richness(ctx)
-    weights = richness_data["weights"]
-    total_richness = richness_data["total_richness"]
-    primary_section = richness_data["primary_section"]
-    
-    # Dynamic total based on richness (Fix #10)
-    if total_richness >= 10:
-        target_total = 8
-    elif total_richness >= 5:
-        target_total = 7
-    else:
-        target_total = 5
-    
-    total = min(total, target_total)
     
     # Always start with canonical introduction
     qlist.append({
@@ -799,92 +664,37 @@ def deterministic_questions_from_context(ctx: dict, total: int = 7) -> List[dict
     
     nid = 2
     
-    # Determine question allocation based on weights (Fix #2)
-    if primary_section == "projects":
-        target_projects = min(4, len(projects))
-        target_experience = min(2, len(companies))
-    elif primary_section == "experience":
-        target_experience = min(4, len(companies))
-        target_projects = min(2, len(projects))
-    else:
-        target_experience = min(3, len(companies))
-        target_projects = min(3, len(projects))
-    
-    # Experience questions with rotation (Fix #6)
-    if ctx.get("has_experience") and companies:
-        for idx, comp in enumerate(companies[:target_experience]):
-            if len(qlist) >= total:
-                break
-            
-            # Varied phrasing (Fix #7)
-            starter = starters[idx % len(starters)]
-            role = comp.get('role', 'your role')
-            company_name = comp['company_name']
-            
-            # More specific questions with tech if available (Fix #3)
-            tech = comp.get('technologies', [])
-            if tech and len(tech) >= 2:
-                tech_str = ', '.join(tech[:3])
-                question = f"{starter} your work at {company_name} as {role}, particularly with {tech_str}?"
-            else:
-                question = f"{starter} your role as {role} at {company_name} and your main responsibilities?"
-            
+    # Experience-first (if present)
+    if ctx.get("has_experience"):
+        for comp in ctx.get("companies", [])[:3]:
             qlist.append({
                 "id": nid,
-                "question": question,
+                "question": f"Can you describe your role as {comp.get('role', '')} at {comp['company_name']} and your main responsibilities?",
                 "category": "experience",
-                "expected_topics": ["role", "responsibilities", company_name] + tech[:3],
-                "context": f"Asked about {company_name}"
+                "expected_topics": ["role", "responsibilities", comp["company_name"]],
+                "context": f"Asked about {comp['company_name']}"
             })
             nid += 1
-    
-    # Project questions with specificity (Fix #3, #6, #7, #8)
-    if len(qlist) < total and ctx.get("has_projects") and projects:
-        for idx, proj in enumerate(projects[:target_projects]):
             if len(qlist) >= total:
                 break
-            
-            title = proj['project_title']
-            tech = proj.get('technologies', [])
-            role = proj.get('role', '')
-            desc = proj.get('description', '').lower()
-            
-            # Check if ongoing (Fix #8)
-            is_ongoing = 'ongoing' in desc or 'current' in desc or 'in progress' in desc
-            
-            if is_ongoing:
-                question = f"Since '{title}' is ongoing, what are you currently working on and what are the next steps?"
-            else:
-                # Varied starter (Fix #7)
-                starter = starters[(idx + 3) % len(starters)]  # Offset to avoid matching experience
-                
-                # Include tech if >= 2 technologies (Fix #3, #2)
-                if tech and len(tech) >= 2:
-                    tech_str = ', '.join(tech[:3])
-                    question = f"{starter} the '{title}' project, specifically how you used {tech_str} and what challenges you faced?"
-                elif tech and len(tech) == 1 and tech[0].lower() not in ['python', 'java', 'c', 'c++']:
-                    question = f"{starter} the '{title}' project and your experience with {tech[0]}?"
-                else:
-                    question = f"{starter} the '{title}' project: your role, key technical choices, and main challenges?"
-            
-            expected = ["project", title, "technical choices"]
-            if tech:
-                expected.extend(tech[:3])
-            if role:
-                expected.append(role)
-            
+    
+    # Projects
+    if len(qlist) < total and ctx.get("has_projects"):
+        for proj in ctx.get("projects", [])[:3]:
             qlist.append({
                 "id": nid,
-                "question": question,
+                "question": f"Walk me through the project '{proj['project_title']}': your role, key technical choices, and main challenges.",
                 "category": "project",
-                "expected_topics": expected,
-                "context": f"Asked about {title}"
+                "expected_topics": ["project", proj["project_title"], "technical choices"],
+                "context": f"Asked about {proj['project_title']}"
             })
             nid += 1
+            if len(qlist) >= total:
+                break
     
-    # Certifications - only if present and relevant (Fix #4, #1)
-    if len(qlist) < total and ctx.get("has_certifications") and certifications:
-        cert = certifications[0]
+    # Certifications / achievements next
+    if len(qlist) < total and ctx.get("has_certifications"):
+        cert = ctx.get("certifications", [])[0]
         qlist.append({
             "id": nid,
             "question": f"You have the '{cert['name']}' certification. Why did you pursue it and how have you applied it?",
@@ -894,42 +704,30 @@ def deterministic_questions_from_context(ctx: dict, total: int = 7) -> List[dict
         })
         nid += 1
     
-    # If no certifications, ask about self-learning instead (Fix #1, #9)
-    elif len(qlist) < total and not ctx.get("has_certifications"):
-        qlist.append({
-            "id": nid,
-            "question": "Have you been working on any self-learning, online courses, or personal projects recently to build your skills?",
-            "category": "skills_development",
-            "expected_topics": ["self-learning", "personal development", "continuous learning"],
-            "context": "Skills development question"
-        })
-        nid += 1
-    
     # Achievements
-    if len(qlist) < total and ctx.get("has_achievements") and achievements:
+    if len(qlist) < total and ctx.get("has_achievements"):
+        achievements = ctx.get("achievements", [])
+        if achievements:
+            qlist.append({
+                "id": nid,
+                "question": f"You mentioned achieving '{achievements[0]}'. Can you elaborate on that?",
+                "category": "achievement",
+                "expected_topics": ["achievement", "accomplishment"],
+                "context": "Asked about listed achievement"
+            })
+            nid += 1
+    
+    # Education-based questions if needed
+    if len(qlist) < total and ctx.get("education"):
+        edu = ctx.get("education", [])[0]
         qlist.append({
             "id": nid,
-            "question": f"You mentioned achieving '{achievements[0]}'. Can you elaborate on that?",
-            "category": "achievement",
-            "expected_topics": ["achievement", "accomplishment"],
-            "context": "Asked about listed achievement"
+            "question": f"Tell me about your time at {edu['institution']} and what you studied.",
+            "category": "education",
+            "expected_topics": ["education", edu["institution"], "studies"],
+            "context": f"Asked about {edu['institution']}"
         })
         nid += 1
-    
-    # Education - only if significant (Fix #5)
-    if len(qlist) < total and ctx.get("education"):
-        edu_list = ctx.get("education", [])
-        if edu_list:
-            edu = edu_list[0]
-            if education_is_significant(edu):
-                qlist.append({
-                    "id": nid,
-                    "question": f"Tell me about your time at {edu['institution']} and what you studied.",
-                    "category": "education",
-                    "expected_topics": ["education", edu["institution"], "studies"],
-                    "context": f"Asked about {edu['institution']}"
-                })
-                nid += 1
     
     # Pad with skills-based questions if still short
     while len(qlist) < total:
@@ -1039,32 +837,6 @@ async def generate_questions(resume_data: EnhancedResumeOutput):
         logger.info(json.dumps(resume_context, indent=2))
         logger.info(f"{'='*50}")
         
-        # Fix #1: Calculate dynamic question distribution based on resume content
-        exp_count = len(resume_context.get("companies", []))
-        proj_count = len(resume_context.get("projects", []))
-        cert_count = len(resume_context.get("certifications", []))
-        ach_count = len(resume_context.get("achievements", []))
-        
-        total_items = exp_count + proj_count + cert_count + ach_count
-        
-        if total_items > 0:
-            exp_q = round((exp_count / total_items) * 5) if exp_count > 0 else 0
-            proj_q = round((proj_count / total_items) * 5) if proj_count > 0 else 0
-            cert_q = 1 if cert_count > 0 else 0
-            ach_q = 1 if ach_count > 0 else 0
-            
-            distribution_note = f"""\n**QUESTION DISTRIBUTION FOR THIS RESUME:**
-- Experience questions: {exp_q} (based on {exp_count} experiences)
-- Project questions: {proj_q} (based on {proj_count} projects)
-- Certification questions: {cert_q} (based on {cert_count} certifications)
-- Achievement questions: {ach_q} (based on {ach_count} achievements)
-
-Adjust the 6 non-intro questions to match this distribution."""
-        else:
-            distribution_note = "\n**NOTE:** Very limited resume data. Generate basic skill and education questions."
-        
-        logger.info(f"📊 DYNAMIC DISTRIBUTION: exp={exp_q if total_items > 0 else 0}, proj={proj_q if total_items > 0 else 0}")
-        
         # Generate prompt with structured data
         prompt = STRUCTURED_QUESTION_GENERATION_PROMPT.format(
             resume_context=json.dumps(resume_context, indent=2),
@@ -1072,7 +844,7 @@ Adjust the 6 non-intro questions to match this distribution."""
             has_projects=resume_context.get('has_projects'),
             has_certifications=resume_context.get('has_certifications'),
             has_achievements=resume_context.get('has_achievements')
-        ) + distribution_note
+        )
         
         # Use larger model with zero temperature for deterministic output
         llm = ChatGroq(
@@ -1084,11 +856,6 @@ Adjust the 6 non-intro questions to match this distribution."""
         
         response = llm.invoke(prompt)
         questions_data = safe_json_parse(response.content)
-        
-        # Fix #5: Strict JSON validation
-        if "questions" not in questions_data or not isinstance(questions_data.get("questions"), list):
-            logger.error(f"⚠️ Invalid JSON format from LLM. Using deterministic fallback.")
-            questions_data = {"questions": []}
         
         questions = questions_data.get("questions", [])
         
@@ -1332,22 +1099,16 @@ async def score_answers(scoring_input: ScoringInput):
 async def health_check():
     return {
         "status": "healthy",
-        "version": "3.2.0",
+        "version": "3.1.0",
         "groq_configured": bool(GROQ_API_KEY),
         "features": [
             "Resume parsing with null for missing fields",
             "Structured question generation (eliminates hallucination)",
-            "Dynamic question allocation based on resume richness",
-            "Varied question phrasing to avoid repetition",
-            "Technology-specific questions when applicable",
-            "Ongoing project detection",
-            "Education significance filtering",
-            "Self-learning questions instead of negative framing",
-            "Adaptive question count (4-8 based on resume)",
             "Answer scoring with detailed feedback",
             "No technology bias - purely resume-driven",
             "Enhanced validation with hallucination detection",
-            "Temperature 0.0 for deterministic results",
+            "Debug endpoint for troubleshooting",
+            "Lower temperature (0.1) for more deterministic results",
             "70B model for better reasoning"
         ]
     }
