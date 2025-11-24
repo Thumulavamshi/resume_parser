@@ -1,0 +1,1747 @@
+{
+  "generatedAt": "2025-11-24T17:20:28.139Z",
+  "apis": {
+    "parse-resume": [
+      {
+        "timestamp": "2025-11-24T16:54:57.095Z",
+        "apiName": "parse-resume",
+        "request": {
+          "fileName": "Resume_mindtickle.pdf",
+          "fileSize": 127068,
+          "fileType": "application/pdf",
+          "endpoint": "parse-resume"
+        },
+        "response": {
+          "personal_info": {
+            "name": "Thumula Vamshidhar Rao",
+            "email": "thumulavamshidhar@gmail.com",
+            "phone": "+91-8309942858",
+            "linkedin": "linkedin",
+            "github": null,
+            "website": null,
+            "location": null
+          },
+          "education": [
+            {
+              "institution": "Vellore Institute of Technology Vellore, Tamil Nadu",
+              "degree": "B.Tech Minor in Computer Science Engineering",
+              "field_of_study": null,
+              "grade": null,
+              "start_date": "Sep. 2022",
+              "end_date": "Present",
+              "achievements": null
+            },
+            {
+              "institution": "Vellore Institute of Technology Vellore, Tamil Nadu",
+              "degree": "B.Tech in Mechanical Engineering",
+              "field_of_study": null,
+              "grade": "GPA: 8.82/10.00",
+              "start_date": "Sep. 2022",
+              "end_date": "Present",
+              "achievements": null
+            },
+            {
+              "institution": "Narayana Junior College Hyderabad, Telangana",
+              "degree": "Intermediate Education in Mathematics and Science",
+              "field_of_study": null,
+              "grade": "SCORE: 944/1000",
+              "start_date": "May 2020",
+              "end_date": "May 2022",
+              "achievements": null
+            },
+            {
+              "institution": "Matrix High School Hanamkonda, Telangana",
+              "degree": "Matriculation",
+              "field_of_study": null,
+              "grade": "GPA: 10.00/10.00",
+              "start_date": "May 2020",
+              "end_date": null,
+              "achievements": null
+            }
+          ],
+          "experience": [
+            {
+              "company": "Ebani Tech Pvt. Ltd.",
+              "role": "Intern",
+              "start_date": "June 2024",
+              "end_date": null,
+              "duration": null,
+              "location": "Hyderabad (Onsite)",
+              "responsibilities": [
+                "Contributed to backend API development and CRM modules following SDLC practices, improving scalability and reliability of enterprise applications.",
+                "Applied structured debugging and testing protocols to resolve recurring server-side issues, reducing downtime.",
+                "Optimized SQL queries and schema design in MySQL/Postgres to improve performance and data accuracy.",
+                "Collaborated with Agile teams and participated in code reviews, ensuring maintainable and scalable backend solutions."
+              ],
+              "technologies_used": [
+                "Node.js",
+                "Express.js",
+                "Django",
+                "REST APIs",
+                "WebSockets",
+                "MySQL",
+                "PostgreSQL",
+                "Redis"
+              ],
+              "key_achievements": null
+            }
+          ],
+          "projects": [
+            {
+              "title": "NexChat – Scalable Real-Time Communication Platform",
+              "description": "Built a real-time communication platform with chat, file sharing, and live user search using Node.js, React, and WebSockets.",
+              "role": "Solo",
+              "technologies": [
+                "Node.js",
+                "React",
+                "PostgreSQL",
+                "Redis",
+                "AWS"
+              ],
+              "key_features": [
+                "Real-time communication",
+                "Chat",
+                "File sharing",
+                "Live user search"
+              ],
+              "challenges_solved": [
+                "Scalable WebSocket-based architecture",
+                "Concurrent sessions with minimal latency"
+              ],
+              "link": null,
+              "duration": "2025"
+            }
+          ],
+          "skills": {
+            "languages": [
+              "Java",
+              "Python",
+              "Golang",
+              "C++",
+              "C",
+              "JavaScript",
+              "TypeScript",
+              "R",
+              "SQL"
+            ],
+            "frameworks": [
+              "React.js",
+              "Express.js",
+              "Django"
+            ],
+            "databases": [
+              "PostgreSQL",
+              "MySQL",
+              "MongoDB",
+              "Redis"
+            ],
+            "tools": [
+              "Git",
+              "Docker Compose",
+              "Unix/Linux",
+              "Bash",
+              "Prisma"
+            ],
+            "cloud_platforms": [
+              "AWS (EC2, Lambda, S3)"
+            ],
+            "other": [
+              "TensorFlow",
+              "Hugging Face",
+              "LangChain",
+              "RAG Pipelines",
+              "Scikit-learn"
+            ]
+          },
+          "certifications": [
+            {
+              "name": "Oracle Cloud Infrastructure 2024 Certified Professional",
+              "issuer": null,
+              "issue_date": null,
+              "expiry_date": null,
+              "credential_id": null
+            }
+          ],
+          "achievements": [
+            "Finalist, National Entrepreneurship Challenge, IIT Bombay Bombay, India (Feb. 2024)"
+          ],
+          "publications": null,
+          "languages": null
+        },
+        "requestSize": 109,
+        "responseSize": 3068
+      },
+      {
+        "timestamp": "2025-11-24T17:17:18.436Z",
+        "apiName": "parse-resume",
+        "request": {
+          "fileName": "BraclaysDA.pdf",
+          "fileSize": 125489,
+          "fileType": "application/pdf",
+          "endpoint": "parse-resume"
+        },
+        "response": {
+          "personal_info": {
+            "name": "Thumula Vamshidhar Rao",
+            "email": "thumulavamshidhar@gmail.com",
+            "phone": "+91-8309942858",
+            "linkedin": "linkedin",
+            "github": null,
+            "website": null,
+            "location": null
+          },
+          "education": [
+            {
+              "institution": "Narayana Junior College",
+              "degree": "Intermediate Education in Mathematics and Science",
+              "field_of_study": null,
+              "grade": "944/1000",
+              "start_date": "May 2020",
+              "end_date": "May 2022",
+              "achievements": null
+            },
+            {
+              "institution": "Matrix High School",
+              "degree": "Matriculation",
+              "field_of_study": null,
+              "grade": "10.00/10.00",
+              "start_date": "May 2020",
+              "end_date": null,
+              "achievements": null
+            },
+            {
+              "institution": "Vellore Institute of Technology",
+              "degree": "B.Tech in Mechanical Engineering",
+              "field_of_study": null,
+              "grade": "8.82/10.00",
+              "start_date": "Sep. 2022",
+              "end_date": null,
+              "achievements": null
+            },
+            {
+              "institution": "Vellore Institute of Technology",
+              "degree": "B.Tech Minor in Computer Science Engineering",
+              "field_of_study": null,
+              "grade": null,
+              "start_date": "Sep. 2022",
+              "end_date": null,
+              "achievements": null
+            }
+          ],
+          "experience": [
+            {
+              "company": "Ebani Tech Pvt. Ltd.",
+              "role": "Intern",
+              "start_date": "June 2024",
+              "end_date": null,
+              "duration": null,
+              "location": "Hyderabad (Onsite)",
+              "responsibilities": [
+                "Developed Python-based scripts using Pandas and SQL to extract and process user interaction data (e.g., ad clicks, impressions), ensuring accuracy and reliability of inputs.",
+                "Designed and optimized SQL queries to aggregate and analyze ad response data, enabling real-time tracking of user engagement metrics for campaign performance.",
+                "Collaborated with cross-functional stakeholders to deliver Excel reports and Tableau dashboards, effectively communicating actionable insights to business teams.",
+                "Experimented with an AI-based model on processed data to uncover patterns (e.g., optimal ad posting times), providing insights for improving ad placement strategies."
+              ],
+              "technologies_used": [
+                "Python",
+                "Pandas",
+                "SQL",
+                "Tableau",
+                "Excel"
+              ],
+              "key_achievements": null
+            }
+          ],
+          "projects": [
+            {
+              "title": "Customer Churn Analysis and Data Pipeline",
+              "description": "Built an automated ETL pipeline using Python (Pandas, SQLAlchemy) to extract, cleanse, and transform e-commerce customer data, improving data quality and trustworthiness.",
+              "role": "Solo",
+              "technologies": [
+                "Python",
+                "SQL",
+                "Tableau",
+                "Excel"
+              ],
+              "key_features": [
+                "Automated ETL pipeline",
+                "SQL Server star schema",
+                "Interactive Tableau dashboards"
+              ],
+              "challenges_solved": [
+                "Improved data quality and trustworthiness",
+                "Efficient analysis of churn trends and customer behavior"
+              ],
+              "link": null,
+              "duration": "March 2024"
+            }
+          ],
+          "skills": {
+            "languages": [
+              "Python",
+              "R",
+              "Java"
+            ],
+            "frameworks": null,
+            "databases": [
+              "SQL (PostgreSQL, SQL Server)",
+              "MongoDB"
+            ],
+            "tools": [
+              "Microsoft Excel",
+              "Tableau",
+              "Word"
+            ],
+            "cloud_platforms": [
+              "AWS (EC2, Lambda, S3)"
+            ],
+            "other": [
+              "ETL Pipelines",
+              "Data Cleansing",
+              "Validation & Controls",
+              "Governance Awareness",
+              "TensorFlow",
+              "LangChain",
+              "Hugging Face",
+              "RAG Pipelines",
+              "Scikit-learn",
+              "Git",
+              "Docker",
+              "Unix/Linux"
+            ]
+          },
+          "certifications": [
+            {
+              "name": "Oracle Cloud Infrastructure 2024 Certified Professional",
+              "issuer": null,
+              "issue_date": null,
+              "expiry_date": null,
+              "credential_id": null
+            }
+          ],
+          "achievements": [
+            "Finalist in National Entrepreneurship Challenge, IIT Bombay Bombay, India (Oct. 2023)"
+          ],
+          "publications": null,
+          "languages": null
+        },
+        "requestSize": 102,
+        "responseSize": 3179
+      },
+      {
+        "timestamp": "2025-11-24T17:19:20.481Z",
+        "apiName": "parse-resume",
+        "request": {
+          "fileName": "Wayfair Software Engineer Intern.pdf",
+          "fileSize": 128528,
+          "fileType": "application/pdf",
+          "endpoint": "parse-resume"
+        },
+        "response": {
+          "personal_info": {
+            "name": "Thumula Vamshidhar Rao",
+            "email": "thumulavamshidhar@gmail.com",
+            "phone": "+91-8309942858",
+            "linkedin": "linkedin.com/in/vamshidhar-rao-thumula-2095bb252",
+            "github": null,
+            "website": null,
+            "location": null
+          },
+          "education": [
+            {
+              "institution": "Narayana Junior College",
+              "degree": "Intermediate in Mathematics and Science",
+              "field_of_study": null,
+              "grade": "944/1000",
+              "start_date": "May 2020",
+              "end_date": "May 2022",
+              "achievements": null
+            },
+            {
+              "institution": "Matrix High School",
+              "degree": "Matriculation",
+              "field_of_study": null,
+              "grade": "10.00/10.00",
+              "start_date": null,
+              "end_date": "May 2020",
+              "achievements": null
+            },
+            {
+              "institution": "Vellore Institute of Technology",
+              "degree": "B.Tech in Mechanical Engineering",
+              "field_of_study": null,
+              "grade": "8.82/10.00",
+              "start_date": "Sep. 2022",
+              "end_date": "Present",
+              "achievements": null
+            },
+            {
+              "institution": "Vellore Institute of Technology",
+              "degree": "B.Tech Minor in Computer Science Engineering",
+              "field_of_study": null,
+              "grade": null,
+              "start_date": "Sep. 2022",
+              "end_date": "Present",
+              "achievements": null
+            }
+          ],
+          "experience": [
+            {
+              "company": "Ebani Tech Pvt. Ltd.",
+              "role": "Software Developer Intern",
+              "start_date": "June 2024",
+              "end_date": "Aug. 2024",
+              "duration": "2 months",
+              "location": "Hyderabad",
+              "responsibilities": [
+                "Developed full-stack modules using Node.js, Express.js, React.js, and MySQL, improving scalability and maintainability of CRM systems.",
+                "Designed and optimized RESTful APIs with secure authentication and input validation mechanisms.",
+                "Enhanced database performance through schema refactoring and query optimization.",
+                "Collaborated in Agile sprints with UI/UX and backend teams, delivering production-ready features under mentorship."
+              ],
+              "technologies_used": [
+                "Node.js",
+                "Express.js",
+                "React.js",
+                "MySQL"
+              ],
+              "key_achievements": null
+            }
+          ],
+          "projects": [
+            {
+              "title": "AI-Powered Interview Platform",
+              "description": "Developed a MERN-based platform that automates interview assessments using AI-driven question generation and resume parsing.",
+              "role": "Solo",
+              "technologies": [
+                "React",
+                "TypeScript",
+                "Node.js",
+                "Express.js",
+                "MongoDB",
+                "Redux Toolkit",
+                "AWS"
+              ],
+              "key_features": [
+                "AI-driven question generation",
+                "Resume parsing"
+              ],
+              "challenges_solved": null,
+              "link": null,
+              "duration": "2025"
+            },
+            {
+              "title": "NexChat – Real-Time Communication App",
+              "description": "Built a real-time chat app supporting live messaging, file sharing, and user activity tracking.",
+              "role": "Solo",
+              "technologies": [
+                "Node.js",
+                "React",
+                "MongoDB",
+                "Redis",
+                "Socket.io",
+                "AWS"
+              ],
+              "key_features": [
+                "Real-time messaging",
+                "File sharing",
+                "User activity tracking"
+              ],
+              "challenges_solved": null,
+              "link": null,
+              "duration": "2025"
+            }
+          ],
+          "skills": {
+            "languages": [
+              "JavaScript (ES6+)",
+              "TypeScript",
+              "Python",
+              "SQL"
+            ],
+            "frameworks": [
+              "React.js",
+              "Next.js",
+              "Redux Toolkit"
+            ],
+            "databases": [
+              "MongoDB",
+              "PostgreSQL",
+              "MySQL",
+              "Redis"
+            ],
+            "tools": [
+              "Git",
+              "Docker",
+              "AWS (EC2, S3, Lambda)",
+              "Postman",
+              "Prisma",
+              "Figma"
+            ],
+            "cloud_platforms": [
+              "AWS"
+            ],
+            "other": null
+          },
+          "certifications": null,
+          "achievements": [
+            "Finalist, National Entrepreneurship Challenge, IIT Bombay Mumbai, India (Feb. 2024)"
+          ],
+          "publications": null,
+          "languages": null
+        },
+        "requestSize": 124,
+        "responseSize": 2993
+      }
+    ],
+    "generate-questions": [
+      {
+        "timestamp": "2025-11-24T16:55:14.209Z",
+        "apiName": "generate-questions",
+        "request": {
+          "personal_info": {
+            "name": "Thumula Vamshidhar Rao",
+            "email": "thumulavamshidhar@gmail.com",
+            "phone": "+91-8309942858",
+            "linkedin": "linkedin",
+            "github": "not found",
+            "website": "not found"
+          },
+          "other_info": {
+            "education": [
+              {
+                "institution": "Vellore Institute of Technology Vellore, Tamil Nadu"
+              },
+              {
+                "institution": "Vellore Institute of Technology Vellore, Tamil Nadu"
+              },
+              {
+                "institution": "Narayana Junior College Hyderabad, Telangana"
+              },
+              {
+                "institution": "Matrix High School Hanamkonda, Telangana"
+              }
+            ],
+            "experience": [
+              {
+                "key": "Ebani Tech Pvt. Ltd.",
+                "start": "June 2024",
+                "end": "Present",
+                "description": [
+                  "Contributed to backend API development and CRM modules following SDLC practices, improving scalability and reliability of enterprise applications.",
+                  "Applied structured debugging and testing protocols to resolve recurring server-side issues, reducing downtime.",
+                  "Optimized SQL queries and schema design in MySQL/Postgres to improve performance and data accuracy.",
+                  "Collaborated with Agile teams and participated in code reviews, ensuring maintainable and scalable backend solutions."
+                ]
+              }
+            ],
+            "projects": [
+              {
+                "title": "NexChat – Scalable Real-Time Communication Platform",
+                "description": [
+                  "Built a real-time communication platform with chat, file sharing, and live user search using Node.js, React, and WebSockets."
+                ]
+              }
+            ],
+            "extra_info": {
+              "skills": [
+                "Java",
+                "Python",
+                "Golang",
+                "C++",
+                "C",
+                "JavaScript",
+                "TypeScript",
+                "R",
+                "SQL",
+                "React.js",
+                "Express.js",
+                "Django",
+                "PostgreSQL",
+                "MySQL",
+                "MongoDB",
+                "Redis",
+                "Git",
+                "Docker Compose",
+                "Unix/Linux",
+                "Bash",
+                "Prisma",
+                "AWS (EC2, Lambda, S3)",
+                "TensorFlow",
+                "Hugging Face",
+                "LangChain",
+                "RAG Pipelines",
+                "Scikit-learn"
+              ]
+            }
+          }
+        },
+        "response": {
+          "candidate_name": "Thumula Vamshidhar Rao",
+          "questions": [
+            {
+              "id": 1,
+              "question": "Tell me about yourself — your background, education, any experience you have, and projects you've worked on. Feel free to share any interests or hobbies as well.",
+              "category": "introduction",
+              "expected_topics": [
+                "background",
+                "education",
+                "experience",
+                "projects",
+                "interests"
+              ],
+              "context": "Opening introduction"
+            },
+            {
+              "id": 2,
+              "question": "Can you tell me about your role at [Company Name]? What were your main responsibilities?",
+              "category": "experience",
+              "expected_topics": [
+                "role",
+                "responsibilities",
+                "Company Name"
+              ],
+              "context": "Candidate mentioned working experience in resume"
+            },
+            {
+              "id": 3,
+              "question": "What was the most challenging aspect of working at [Company Name]?",
+              "category": "experience",
+              "expected_topics": [
+                "challenges",
+                "Company Name"
+              ],
+              "context": "Candidate mentioned working experience in resume"
+            },
+            {
+              "id": 4,
+              "question": "What did you learn during your time at [Company Name]?",
+              "category": "experience",
+              "expected_topics": [
+                "learning",
+                "Company Name"
+              ],
+              "context": "Candidate mentioned working experience in resume"
+            },
+            {
+              "id": 5,
+              "question": "I see you worked on [Project Name]. Can you walk me through what that project was about?",
+              "category": "project",
+              "expected_topics": [
+                "project",
+                "Project Name"
+              ],
+              "context": "Candidate mentioned project in resume"
+            },
+            {
+              "id": 6,
+              "question": "What was your role in the [Project Name] project?",
+              "category": "project",
+              "expected_topics": [
+                "role",
+                "Project Name"
+              ],
+              "context": "Candidate mentioned project in resume"
+            },
+            {
+              "id": 7,
+              "question": "I see that you have completed the AWS Certified Developer - Associate certification. What motivated you to pursue that?",
+              "category": "certification",
+              "expected_topics": [
+                "certification",
+                "AWS Certified Developer - Associate"
+              ],
+              "context": "Candidate mentioned certification in resume"
+            }
+          ],
+          "total_questions": 7
+        },
+        "requestSize": 1588,
+        "responseSize": 1799
+      },
+      {
+        "timestamp": "2025-11-24T17:17:32.016Z",
+        "apiName": "generate-questions",
+        "request": {
+          "personal_info": {
+            "name": "Thumula Vamshidhar Rao",
+            "email": "thumulavamshidhar@gmail.com",
+            "phone": "+91-8309942858",
+            "linkedin": "linkedin",
+            "github": "not found",
+            "website": "not found"
+          },
+          "other_info": {
+            "education": [
+              {
+                "institution": "Narayana Junior College"
+              },
+              {
+                "institution": "Matrix High School"
+              },
+              {
+                "institution": "Vellore Institute of Technology"
+              },
+              {
+                "institution": "Vellore Institute of Technology"
+              }
+            ],
+            "experience": [
+              {
+                "key": "Ebani Tech Pvt. Ltd.",
+                "start": "June 2024",
+                "end": "Present",
+                "description": [
+                  "Developed Python-based scripts using Pandas and SQL to extract and process user interaction data (e.g., ad clicks, impressions), ensuring accuracy and reliability of inputs.",
+                  "Designed and optimized SQL queries to aggregate and analyze ad response data, enabling real-time tracking of user engagement metrics for campaign performance.",
+                  "Collaborated with cross-functional stakeholders to deliver Excel reports and Tableau dashboards, effectively communicating actionable insights to business teams.",
+                  "Experimented with an AI-based model on processed data to uncover patterns (e.g., optimal ad posting times), providing insights for improving ad placement strategies."
+                ]
+              }
+            ],
+            "projects": [
+              {
+                "title": "Customer Churn Analysis and Data Pipeline",
+                "description": [
+                  "Built an automated ETL pipeline using Python (Pandas, SQLAlchemy) to extract, cleanse, and transform e-commerce customer data, improving data quality and trustworthiness."
+                ]
+              }
+            ],
+            "extra_info": {
+              "skills": [
+                "Python",
+                "R",
+                "Java",
+                "SQL (PostgreSQL, SQL Server)",
+                "MongoDB",
+                "Microsoft Excel",
+                "Tableau",
+                "Word",
+                "AWS (EC2, Lambda, S3)",
+                "ETL Pipelines",
+                "Data Cleansing",
+                "Validation & Controls",
+                "Governance Awareness",
+                "TensorFlow",
+                "LangChain",
+                "Hugging Face",
+                "RAG Pipelines",
+                "Scikit-learn",
+                "Git",
+                "Docker",
+                "Unix/Linux"
+              ]
+            }
+          }
+        },
+        "response": {
+          "candidate_name": "Thumula Vamshidhar Rao",
+          "questions": [
+            {
+              "id": 1,
+              "question": "Tell me about yourself — your background, education, any experience you have, and projects you've worked on. Feel free to share any interests or hobbies as well.",
+              "category": "introduction",
+              "expected_topics": [
+                "background",
+                "education",
+                "experience",
+                "projects",
+                "interests"
+              ],
+              "context": "Opening introduction"
+            },
+            {
+              "id": 2,
+              "question": "I see you have a Bachelor of Technology in Electronics and Communication Engineering from JNTUH College of Engineering Hyderabad. What subjects or areas did you focus on during your studies?",
+              "category": "education",
+              "expected_topics": [
+                "electronics",
+                "communication engineering",
+                "technology"
+              ],
+              "context": "Asked because candidate mentioned education in resume"
+            },
+            {
+              "id": 3,
+              "question": "At LTI, you worked as a Software Engineer. Can you tell me about your role at LTI? What were your main responsibilities?",
+              "category": "experience",
+              "expected_topics": [
+                "software engineer",
+                "lti",
+                "role responsibilities"
+              ],
+              "context": "Asked because candidate mentioned professional experience in resume"
+            },
+            {
+              "id": 4,
+              "question": "I see you worked on a project called 'Android App Development using Java'. Can you walk me through what that project was about?",
+              "category": "project",
+              "expected_topics": [
+                "android app development",
+                "java",
+                "project"
+              ],
+              "context": "Asked because candidate mentioned project in resume"
+            },
+            {
+              "id": 5,
+              "question": "At LTI, you worked with Java. How did you use Java in your work?",
+              "category": "skill",
+              "expected_topics": [
+                "java",
+                "usage"
+              ],
+              "context": "Asked because candidate mentioned java in resume"
+            },
+            {
+              "id": 6,
+              "question": "I see you have a certification in AWS Certified Cloud Practitioner - Essentials. What motivated you to pursue that?",
+              "category": "certification",
+              "expected_topics": [
+                "aws",
+                "cloud practitioner",
+                "certification"
+              ],
+              "context": "Asked because candidate mentioned certification in resume"
+            },
+            {
+              "id": 7,
+              "question": "At LTI, you worked on several projects. What was the most interesting part of building your projects?",
+              "category": "experience",
+              "expected_topics": [
+                "lti",
+                "projects",
+                "interesting part"
+              ],
+              "context": "Asked because candidate mentioned professional experience in resume"
+            }
+          ],
+          "total_questions": 7
+        },
+        "requestSize": 1735,
+        "responseSize": 2177
+      },
+      {
+        "timestamp": "2025-11-24T17:19:27.609Z",
+        "apiName": "generate-questions",
+        "request": {
+          "personal_info": {
+            "name": "Thumula Vamshidhar Rao",
+            "email": "thumulavamshidhar@gmail.com",
+            "phone": "+91-8309942858",
+            "linkedin": "linkedin.com/in/vamshidhar-rao-thumula-2095bb252",
+            "github": "not found",
+            "website": "not found"
+          },
+          "other_info": {
+            "education": [
+              {
+                "institution": "Narayana Junior College"
+              },
+              {
+                "institution": "Matrix High School"
+              },
+              {
+                "institution": "Vellore Institute of Technology"
+              },
+              {
+                "institution": "Vellore Institute of Technology"
+              }
+            ],
+            "experience": [
+              {
+                "key": "Ebani Tech Pvt. Ltd.",
+                "start": "June 2024",
+                "end": "Aug. 2024",
+                "description": [
+                  "Developed full-stack modules using Node.js, Express.js, React.js, and MySQL, improving scalability and maintainability of CRM systems.",
+                  "Designed and optimized RESTful APIs with secure authentication and input validation mechanisms.",
+                  "Enhanced database performance through schema refactoring and query optimization.",
+                  "Collaborated in Agile sprints with UI/UX and backend teams, delivering production-ready features under mentorship."
+                ]
+              }
+            ],
+            "projects": [
+              {
+                "title": "AI-Powered Interview Platform",
+                "description": [
+                  "Developed a MERN-based platform that automates interview assessments using AI-driven question generation and resume parsing."
+                ]
+              },
+              {
+                "title": "NexChat – Real-Time Communication App",
+                "description": [
+                  "Built a real-time chat app supporting live messaging, file sharing, and user activity tracking."
+                ]
+              }
+            ],
+            "extra_info": {
+              "skills": [
+                "JavaScript (ES6+)",
+                "TypeScript",
+                "Python",
+                "SQL",
+                "React.js",
+                "Next.js",
+                "Redux Toolkit",
+                "MongoDB",
+                "PostgreSQL",
+                "MySQL",
+                "Redis",
+                "Git",
+                "Docker",
+                "AWS (EC2, S3, Lambda)",
+                "Postman",
+                "Prisma",
+                "Figma",
+                "AWS"
+              ]
+            }
+          }
+        },
+        "response": {
+          "candidate_name": "Thumula Vamshidhar Rao",
+          "questions": [
+            {
+              "id": 1,
+              "question": "Tell me about yourself — your background, education, any experience you have, and projects you've worked on. Feel free to share any interests or hobbies as well.",
+              "category": "introduction",
+              "expected_topics": [
+                "background",
+                "education",
+                "experience",
+                "projects",
+                "interests"
+              ],
+              "context": "Opening introduction"
+            },
+            {
+              "id": 2,
+              "question": "What was the most challenging aspect of working at HCL Technologies?",
+              "category": "experience",
+              "expected_topics": [
+                "HCL Technologies",
+                "challenges"
+              ],
+              "context": "Candidate mentioned working at HCL Technologies in resume"
+            },
+            {
+              "id": 3,
+              "question": "Can you walk me through your experience working on projects as a Team Lead at HCL Technologies?",
+              "category": "experience",
+              "expected_topics": [
+                "team lead",
+                "HCL Technologies",
+                "projects"
+              ],
+              "context": "Candidate mentioned being a Team Lead at HCL Technologies in resume"
+            },
+            {
+              "id": 4,
+              "question": "What was your role in the ETL Developer project?",
+              "category": "project",
+              "expected_topics": [
+                "ETL Developer project",
+                "role"
+              ],
+              "context": "Candidate mentioned working on the ETL Developer project in resume"
+            },
+            {
+              "id": 5,
+              "question": "Can you elaborate on your experience in implementing Business Intelligence solutions?",
+              "category": "achievement",
+              "expected_topics": [
+                "business intelligence",
+                "experience"
+              ],
+              "context": "Candidate mentioned implementing Business Intelligence solutions in resume"
+            },
+            {
+              "id": 6,
+              "question": "I see you have a certification from IBM. What motivated you to pursue that?",
+              "category": "certification",
+              "expected_topics": [
+                "IBM",
+                "certification"
+              ],
+              "context": "Candidate mentioned having a certification from IBM in resume"
+            },
+            {
+              "id": 7,
+              "question": "What subjects or areas did you focus on during your studies at NIT Warangal?",
+              "category": "education",
+              "expected_topics": [
+                "NIT Warangal",
+                "subjects"
+              ],
+              "context": "Candidate mentioned studying at NIT Warangal in resume"
+            }
+          ],
+          "total_questions": 7
+        },
+        "requestSize": 1546,
+        "responseSize": 1897
+      }
+    ],
+    "score-answers": [
+      {
+        "timestamp": "2025-11-24T16:56:11.448Z",
+        "apiName": "score-answers",
+        "request": {
+          "candidate_info": {
+            "name": "Thumula Vamshidhar Rao",
+            "technology": "React.js"
+          },
+          "interview_data": [
+            {
+              "question_id": 1,
+              "question": "Tell me about yourself — your background, education, any experience you have, and projects you've worked on. Feel free to share any interests or hobbies as well.",
+              "category": "introduction",
+              "expected_topics": [
+                "background",
+                "education",
+                "experience",
+                "projects",
+                "interests"
+              ],
+              "answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "max_time_allowed": 120
+            },
+            {
+              "question_id": 2,
+              "question": "Can you tell me about your role at [Company Name]? What were your main responsibilities?",
+              "category": "experience",
+              "expected_topics": [
+                "role",
+                "responsibilities",
+                "Company Name"
+              ],
+              "answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "max_time_allowed": 120
+            },
+            {
+              "question_id": 3,
+              "question": "What was the most challenging aspect of working at [Company Name]?",
+              "category": "experience",
+              "expected_topics": [
+                "challenges",
+                "Company Name"
+              ],
+              "answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "max_time_allowed": 120
+            },
+            {
+              "question_id": 4,
+              "question": "What did you learn during your time at [Company Name]?",
+              "category": "experience",
+              "expected_topics": [
+                "learning",
+                "Company Name"
+              ],
+              "answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "max_time_allowed": 120
+            },
+            {
+              "question_id": 5,
+              "question": "I see you worked on [Project Name]. Can you walk me through what that project was about?",
+              "category": "project",
+              "expected_topics": [
+                "project",
+                "Project Name"
+              ],
+              "answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "max_time_allowed": 120
+            },
+            {
+              "question_id": 6,
+              "question": "What was your role in the [Project Name] project?",
+              "category": "project",
+              "expected_topics": [
+                "role",
+                "Project Name"
+              ],
+              "answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "max_time_allowed": 120
+            },
+            {
+              "question_id": 7,
+              "question": "I see that you have completed the AWS Certified Developer - Associate certification. What motivated you to pursue that?",
+              "category": "certification",
+              "expected_topics": [
+                "certification",
+                "AWS Certified Developer - Associate"
+              ],
+              "answer": "No answer provided",
+              "time_taken": 0,
+              "max_time_allowed": 120
+            }
+          ]
+        },
+        "response": {
+          "candidate_name": "Thumula Vamshidhar Rao",
+          "total_questions": 7,
+          "questions_attempted": 7,
+          "question_scores": [
+            {
+              "question_id": 1,
+              "question": "Tell me about yourself — your background, education, any experience you have, and projects you've worked on. Feel free to share any interests or hobbies as well.",
+              "category": "introduction",
+              "candidate_answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "score": 0,
+              "feedback": "The candidate failed to provide any information about themselves, skipping the question entirely. This indicates a lack of preparedness or willingness to engage with the interview process.",
+              "strengths": [],
+              "weaknesses": [
+                "Failure to address the question",
+                "Lack of engagement"
+              ],
+              "key_points_covered": [],
+              "key_points_missed": [
+                "background",
+                "education",
+                "experience",
+                "projects",
+                "interests"
+              ]
+            },
+            {
+              "question_id": 2,
+              "question": "Can you tell me about your role at [Company Name]? What were your main responsibilities?",
+              "category": "experience",
+              "candidate_answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "score": 0,
+              "feedback": "The candidate failed to provide an answer to the question, resulting in a lack of information about their role and responsibilities at the company.",
+              "strengths": [],
+              "weaknesses": [
+                "Failed to address the question"
+              ],
+              "key_points_covered": [],
+              "key_points_missed": [
+                "role",
+                "responsibilities",
+                "Company Name"
+              ]
+            },
+            {
+              "question_id": 3,
+              "question": "What was the most challenging aspect of working at [Company Name]?",
+              "category": "experience",
+              "candidate_answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "score": 0,
+              "feedback": "The candidate did not provide an answer to the question, therefore it is not possible to evaluate their experience or understanding of the challenges at Company Name.",
+              "strengths": [],
+              "weaknesses": [
+                "Failed to address the question"
+              ],
+              "key_points_covered": [],
+              "key_points_missed": [
+                "Challenges at Company Name"
+              ]
+            },
+            {
+              "question_id": 4,
+              "question": "What did you learn during your time at [Company Name]?",
+              "category": "experience",
+              "candidate_answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "score": 0,
+              "feedback": "The candidate failed to address the question, providing no relevant information about their experience at Company Name.",
+              "strengths": [],
+              "weaknesses": [
+                "Lack of response to the question"
+              ],
+              "key_points_covered": [],
+              "key_points_missed": [
+                "learning",
+                "Company Name"
+              ]
+            },
+            {
+              "question_id": 5,
+              "question": "I see you worked on [Project Name]. Can you walk me through what that project was about?",
+              "category": "project",
+              "candidate_answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "score": 0,
+              "feedback": "The candidate did not provide an answer to the question, therefore it is not possible to evaluate the relevance, completeness, clarity, technical accuracy, or depth of the response.",
+              "strengths": [],
+              "weaknesses": [
+                "Failed to address the question"
+              ],
+              "key_points_covered": [],
+              "key_points_missed": [
+                "Project description",
+                "Project Name details"
+              ]
+            },
+            {
+              "question_id": 6,
+              "question": "What was your role in the [Project Name] project?",
+              "category": "project",
+              "candidate_answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "score": 0,
+              "feedback": "The candidate skipped the question, providing no relevant information about their role in the project. This indicates a lack of engagement or preparation for the interview.",
+              "strengths": [],
+              "weaknesses": [
+                "Failed to address the question",
+                "Lack of preparation or engagement"
+              ],
+              "key_points_covered": [],
+              "key_points_missed": [
+                "Role in the project",
+                "Project Name"
+              ]
+            },
+            {
+              "question_id": 7,
+              "question": "I see that you have completed the AWS Certified Developer - Associate certification. What motivated you to pursue that?",
+              "category": "certification",
+              "candidate_answer": "No answer provided",
+              "time_taken": 0,
+              "score": 0,
+              "feedback": "The candidate did not provide an answer to the question, which means they failed to address the motivation behind pursuing the AWS Certified Developer - Associate certification.",
+              "strengths": [],
+              "weaknesses": [
+                "No answer provided",
+                "Lack of relevance to the question"
+              ],
+              "key_points_covered": [],
+              "key_points_missed": [
+                "Motivation for certification",
+                "Relevance to AWS Certified Developer - Associate"
+              ]
+            }
+          ],
+          "final_score": {
+            "overall_score": 0
+          },
+          "overall_feedback": "Thumula Vamshidhar Rao's overall performance was extremely poor, failing to demonstrate any notable skills or knowledge in all areas of the interview. The candidate did not provide any satisfactory answers to the questions, resulting in a score of 0.0/100. This indicates a significant lack of preparation and understanding of the subject matter.",
+          "recommendation": "no-hire",
+          "strengths_summary": [],
+          "areas_for_improvement": [
+            "introduction and self-presentation",
+            "relevant experience and skills",
+            "project-related knowledge and certification"
+          ]
+        },
+        "requestSize": 2050,
+        "responseSize": 4654
+      },
+      {
+        "timestamp": "2025-11-24T17:18:47.689Z",
+        "apiName": "score-answers",
+        "request": {
+          "candidate_info": {
+            "name": "Thumula Vamshidhar Rao",
+            "technology": "React.js"
+          },
+          "interview_data": [
+            {
+              "question_id": 1,
+              "question": "Tell me about yourself — your background, education, any experience you have, and projects you've worked on. Feel free to share any interests or hobbies as well.",
+              "category": "introduction",
+              "expected_topics": [
+                "background",
+                "education",
+                "experience",
+                "projects",
+                "interests"
+              ],
+              "answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "max_time_allowed": 120
+            },
+            {
+              "question_id": 2,
+              "question": "I see you have a Bachelor of Technology in Electronics and Communication Engineering from JNTUH College of Engineering Hyderabad. What subjects or areas did you focus on during your studies?",
+              "category": "education",
+              "expected_topics": [
+                "electronics",
+                "communication engineering",
+                "technology"
+              ],
+              "answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "max_time_allowed": 120
+            },
+            {
+              "question_id": 3,
+              "question": "At LTI, you worked as a Software Engineer. Can you tell me about your role at LTI? What were your main responsibilities?",
+              "category": "experience",
+              "expected_topics": [
+                "software engineer",
+                "lti",
+                "role responsibilities"
+              ],
+              "answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "max_time_allowed": 120
+            },
+            {
+              "question_id": 4,
+              "question": "I see you worked on a project called 'Android App Development using Java'. Can you walk me through what that project was about?",
+              "category": "project",
+              "expected_topics": [
+                "android app development",
+                "java",
+                "project"
+              ],
+              "answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "max_time_allowed": 120
+            },
+            {
+              "question_id": 5,
+              "question": "At LTI, you worked with Java. How did you use Java in your work?",
+              "category": "skill",
+              "expected_topics": [
+                "java",
+                "usage"
+              ],
+              "answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "max_time_allowed": 120
+            },
+            {
+              "question_id": 6,
+              "question": "I see you have a certification in AWS Certified Cloud Practitioner - Essentials. What motivated you to pursue that?",
+              "category": "certification",
+              "expected_topics": [
+                "aws",
+                "cloud practitioner",
+                "certification"
+              ],
+              "answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "max_time_allowed": 120
+            },
+            {
+              "question_id": 7,
+              "question": "At LTI, you worked on several projects. What was the most interesting part of building your projects?",
+              "category": "experience",
+              "expected_topics": [
+                "lti",
+                "projects",
+                "interesting part"
+              ],
+              "answer": "No answer provided",
+              "time_taken": 0,
+              "max_time_allowed": 120
+            }
+          ]
+        },
+        "response": {
+          "candidate_name": "Thumula Vamshidhar Rao",
+          "total_questions": 7,
+          "questions_attempted": 7,
+          "question_scores": [
+            {
+              "question_id": 1,
+              "question": "Tell me about yourself — your background, education, any experience you have, and projects you've worked on. Feel free to share any interests or hobbies as well.",
+              "category": "introduction",
+              "candidate_answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "score": 0,
+              "feedback": "The candidate did not provide an answer to the question, which means they failed to address any of the expected topics such as background, education, experience, projects, and interests.",
+              "strengths": [],
+              "weaknesses": [
+                "Failed to address the question"
+              ],
+              "key_points_covered": [],
+              "key_points_missed": [
+                "background",
+                "education",
+                "experience",
+                "projects",
+                "interests"
+              ]
+            },
+            {
+              "question_id": 2,
+              "question": "I see you have a Bachelor of Technology in Electronics and Communication Engineering from JNTUH College of Engineering Hyderabad. What subjects or areas did you focus on during your studies?",
+              "category": "education",
+              "candidate_answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "score": 0,
+              "feedback": "The candidate did not provide an answer to the question, resulting in a lack of relevance, completeness, clarity, technical accuracy, and depth.",
+              "strengths": [],
+              "weaknesses": [
+                "Failed to address the question"
+              ],
+              "key_points_covered": [],
+              "key_points_missed": [
+                "electronics",
+                "communication engineering",
+                "technology"
+              ]
+            },
+            {
+              "question_id": 3,
+              "question": "At LTI, you worked as a Software Engineer. Can you tell me about your role at LTI? What were your main responsibilities?",
+              "category": "experience",
+              "candidate_answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "score": 0,
+              "feedback": "The candidate failed to provide an answer to the question, resulting in a complete lack of relevant information.",
+              "strengths": [],
+              "weaknesses": [
+                "Failure to address the question"
+              ],
+              "key_points_covered": [],
+              "key_points_missed": [
+                "Role responsibilities at LTI",
+                "Main responsibilities as a Software Engineer"
+              ]
+            },
+            {
+              "question_id": 4,
+              "question": "I see you worked on a project called 'Android App Development using Java'. Can you walk me through what that project was about?",
+              "category": "project",
+              "candidate_answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "score": 0,
+              "feedback": "The candidate failed to provide an answer to the question, which means they did not address the topic of the 'Android App Development using Java' project. As a result, there is no information to evaluate in terms of completeness, clarity, technical accuracy, or depth of understanding.",
+              "strengths": [],
+              "weaknesses": [
+                "Lack of response to the question"
+              ],
+              "key_points_covered": [],
+              "key_points_missed": [
+                "Project overview",
+                "Role of Java in the project",
+                "Android app development process"
+              ]
+            },
+            {
+              "question_id": 5,
+              "question": "At LTI, you worked with Java. How did you use Java in your work?",
+              "category": "skill",
+              "candidate_answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "score": 0,
+              "feedback": "The candidate did not provide an answer to the question, therefore it is not possible to evaluate their understanding or usage of Java.",
+              "strengths": [],
+              "weaknesses": [
+                "Failed to address the question"
+              ],
+              "key_points_covered": [],
+              "key_points_missed": [
+                "Java usage at LTI",
+                "Relevance of Java in work"
+              ]
+            },
+            {
+              "question_id": 6,
+              "question": "I see you have a certification in AWS Certified Cloud Practitioner - Essentials. What motivated you to pursue that?",
+              "category": "certification",
+              "candidate_answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "score": 0,
+              "feedback": "The candidate failed to provide an answer to the question, which means there's no information to evaluate in terms of relevance, completeness, clarity, technical accuracy, or depth.",
+              "strengths": [],
+              "weaknesses": [
+                "Lack of response to the question"
+              ],
+              "key_points_covered": [],
+              "key_points_missed": [
+                "Motivation for pursuing AWS Certified Cloud Practitioner - Essentials certification",
+                "Relevance of the certification to their career or interests",
+                "Impact of the certification on their understanding of cloud computing"
+              ]
+            },
+            {
+              "question_id": 7,
+              "question": "At LTI, you worked on several projects. What was the most interesting part of building your projects?",
+              "category": "experience",
+              "candidate_answer": "No answer provided",
+              "time_taken": 0,
+              "score": 0,
+              "feedback": "The candidate did not provide an answer to the question, which makes it impossible to evaluate their experience or understanding of the topic.",
+              "strengths": [],
+              "weaknesses": [
+                "No answer provided",
+                "Lack of relevance to the question"
+              ],
+              "key_points_covered": [],
+              "key_points_missed": [
+                "Description of projects at LTI",
+                "Interesting part of building projects"
+              ]
+            }
+          ],
+          "final_score": {
+            "overall_score": 0
+          },
+          "overall_feedback": "Thumula Vamshidhar Rao's overall performance was extremely poor, failing to score in any of the questions. The candidate did not demonstrate any notable skills or experiences. Significant improvement is required in all areas.",
+          "recommendation": "no-hire",
+          "strengths_summary": [],
+          "areas_for_improvement": [
+            "Introduction and self-presentation",
+            "Educational background and relevance",
+            "Professional experience and skillset"
+          ]
+        },
+        "requestSize": 2346,
+        "responseSize": 5059
+      },
+      {
+        "timestamp": "2025-11-24T17:20:24.257Z",
+        "apiName": "score-answers",
+        "request": {
+          "candidate_info": {
+            "name": "Thumula Vamshidhar Rao",
+            "technology": "React.js"
+          },
+          "interview_data": [
+            {
+              "question_id": 1,
+              "question": "Tell me about yourself — your background, education, any experience you have, and projects you've worked on. Feel free to share any interests or hobbies as well.",
+              "category": "introduction",
+              "expected_topics": [
+                "background",
+                "education",
+                "experience",
+                "projects",
+                "interests"
+              ],
+              "answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "max_time_allowed": 120
+            },
+            {
+              "question_id": 2,
+              "question": "What was the most challenging aspect of working at HCL Technologies?",
+              "category": "experience",
+              "expected_topics": [
+                "HCL Technologies",
+                "challenges"
+              ],
+              "answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "max_time_allowed": 120
+            },
+            {
+              "question_id": 3,
+              "question": "Can you walk me through your experience working on projects as a Team Lead at HCL Technologies?",
+              "category": "experience",
+              "expected_topics": [
+                "team lead",
+                "HCL Technologies",
+                "projects"
+              ],
+              "answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "max_time_allowed": 120
+            },
+            {
+              "question_id": 4,
+              "question": "What was your role in the ETL Developer project?",
+              "category": "project",
+              "expected_topics": [
+                "ETL Developer project",
+                "role"
+              ],
+              "answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "max_time_allowed": 120
+            },
+            {
+              "question_id": 5,
+              "question": "Can you elaborate on your experience in implementing Business Intelligence solutions?",
+              "category": "achievement",
+              "expected_topics": [
+                "business intelligence",
+                "experience"
+              ],
+              "answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "max_time_allowed": 120
+            },
+            {
+              "question_id": 6,
+              "question": "I see you have a certification from IBM. What motivated you to pursue that?",
+              "category": "certification",
+              "expected_topics": [
+                "IBM",
+                "certification"
+              ],
+              "answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "max_time_allowed": 120
+            },
+            {
+              "question_id": 7,
+              "question": "What subjects or areas did you focus on during your studies at NIT Warangal?",
+              "category": "education",
+              "expected_topics": [
+                "NIT Warangal",
+                "subjects"
+              ],
+              "answer": "No answer provided",
+              "time_taken": 0,
+              "max_time_allowed": 120
+            }
+          ]
+        },
+        "response": {
+          "candidate_name": "Thumula Vamshidhar Rao",
+          "total_questions": 7,
+          "questions_attempted": 7,
+          "question_scores": [
+            {
+              "question_id": 1,
+              "question": "Tell me about yourself — your background, education, any experience you have, and projects you've worked on. Feel free to share any interests or hobbies as well.",
+              "category": "introduction",
+              "candidate_answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "score": 0,
+              "feedback": "The candidate failed to provide any information about themselves, skipping the question entirely. This indicates a lack of willingness to share their background, education, experience, projects, or interests, which are all crucial aspects of a self-introduction in a professional setting.",
+              "strengths": [],
+              "weaknesses": [
+                "Failed to address the question",
+                "Lack of self-introduction"
+              ],
+              "key_points_covered": [],
+              "key_points_missed": [
+                "background",
+                "education",
+                "experience",
+                "projects",
+                "interests"
+              ]
+            },
+            {
+              "question_id": 2,
+              "question": "What was the most challenging aspect of working at HCL Technologies?",
+              "category": "experience",
+              "candidate_answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "score": 0,
+              "feedback": "The candidate failed to address the question, providing no relevant information about their experience at HCL Technologies or the challenges they faced.",
+              "strengths": [],
+              "weaknesses": [
+                "Lack of response to the question"
+              ],
+              "key_points_covered": [],
+              "key_points_missed": [
+                "Challenges at HCL Technologies"
+              ]
+            },
+            {
+              "question_id": 3,
+              "question": "Can you walk me through your experience working on projects as a Team Lead at HCL Technologies?",
+              "category": "experience",
+              "candidate_answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "score": 0,
+              "feedback": "The candidate failed to provide an answer to the question, which is a significant gap in the evaluation process. As a result, the answer does not address the question, lacks completeness, clarity, technical accuracy, and depth.",
+              "strengths": [],
+              "weaknesses": [
+                "Failed to provide an answer"
+              ],
+              "key_points_covered": [],
+              "key_points_missed": [
+                "Experience as a Team Lead at HCL Technologies",
+                "Project details"
+              ]
+            },
+            {
+              "question_id": 4,
+              "question": "What was your role in the ETL Developer project?",
+              "category": "project",
+              "candidate_answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "score": 0,
+              "feedback": "The candidate skipped the question, providing no relevant information about their role in the ETL Developer project.",
+              "strengths": [],
+              "weaknesses": [
+                "Failed to address the question",
+                "Lack of relevant information"
+              ],
+              "key_points_covered": [],
+              "key_points_missed": [
+                "Role in the ETL Developer project",
+                "Responsibilities and contributions"
+              ]
+            },
+            {
+              "question_id": 5,
+              "question": "Can you elaborate on your experience in implementing Business Intelligence solutions?",
+              "category": "achievement",
+              "candidate_answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "score": 0,
+              "feedback": "The candidate failed to provide an answer to the question, resulting in a lack of relevance, completeness, clarity, technical accuracy, and depth.",
+              "strengths": [],
+              "weaknesses": [
+                "Failed to address the question"
+              ],
+              "key_points_covered": [],
+              "key_points_missed": [
+                "Experience in implementing Business Intelligence solutions"
+              ]
+            },
+            {
+              "question_id": 6,
+              "question": "I see you have a certification from IBM. What motivated you to pursue that?",
+              "category": "certification",
+              "candidate_answer": "Question skipped by candidate",
+              "time_taken": 0,
+              "score": 0,
+              "feedback": "The candidate failed to provide an answer to the question, which means they did not address the motivation behind pursuing the IBM certification. This lack of response does not allow for an evaluation of their understanding or knowledge of the topic.",
+              "strengths": [],
+              "weaknesses": [
+                "Failed to address the question",
+                "Lack of information provided"
+              ],
+              "key_points_covered": [],
+              "key_points_missed": [
+                "Motivation for pursuing the IBM certification",
+                "Relevance of the certification to their career or skills"
+              ]
+            },
+            {
+              "question_id": 7,
+              "question": "What subjects or areas did you focus on during your studies at NIT Warangal?",
+              "category": "education",
+              "candidate_answer": "No answer provided",
+              "time_taken": 0,
+              "score": 0,
+              "feedback": "The candidate did not provide an answer to the question, which is a significant gap in their response. To improve, they should ensure they address all questions directly and provide relevant information about their studies at NIT Warangal, including specific subjects or areas of focus.",
+              "strengths": [],
+              "weaknesses": [
+                "Failure to provide any information"
+              ],
+              "key_points_covered": [],
+              "key_points_missed": [
+                "Subjects or areas of study at NIT Warangal"
+              ]
+            }
+          ],
+          "final_score": {
+            "overall_score": 0
+          },
+          "overall_feedback": "Thumula Vamshidhar Rao's overall performance was extremely poor, failing to score in any of the questions, indicating a significant lack of preparation or knowledge. The candidate did not demonstrate any understanding or skills relevant to the position. This performance suggests a need for substantial improvement in all areas.",
+          "recommendation": "no-hire",
+          "strengths_summary": [],
+          "areas_for_improvement": [
+            "introduction and self-presentation",
+            "relevant experience and skills",
+            "project and achievement explanation"
+          ]
+        },
+        "requestSize": 2030,
+        "responseSize": 5063
+      }
+    ]
+  }
+}

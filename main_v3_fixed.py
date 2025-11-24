@@ -1,9 +1,9 @@
 """
-RESUME-BASED NATURAL INTERVIEW SYSTEM
-======================================
+RESUME-BASED NATURAL INTERVIEW SYSTEM - FIXED VERSION
+=====================================================
 - Parse resume with consistent JSON structure
-- Generate questions purely from resume content
-- Natural interview flow (no difficulty levels)
+- Generate questions purely from resume content using structured approach
+- Eliminate hallucination with strict validation
 - Answer scoring with detailed feedback
 """
 
@@ -25,7 +25,10 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 load_dotenv()
-app = FastAPI(title="Resume-Based Interview System", version="3.0.0")
+
+# Placeholder regex for filling/dropping bracketed placeholders
+PLACEHOLDER_RE = re.compile(r'\[([^\]]+)\]')
+app = FastAPI(title="Resume-Based Interview System", version="3.1.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -257,7 +260,7 @@ RESUME_PARSING_PROMPT = """Extract all information from the resume into structur
 Return JSON only:"""
 
 # ============================================
-# PROMPTS - QUESTION GENERATION (IMPROVED)
+# STRUCTURED QUESTION GENERATION (NEW APPROACH)
 # ============================================
 
 STRUCTURED_QUESTION_GENERATION_PROMPT = """You are an expert technical interviewer. Generate interview questions based ONLY on the structured resume data below.
@@ -346,6 +349,8 @@ Priority order:
     {{"id": 7, ...}}
   ]
 }}
+
+**CRITICAL: IF YOU CANNOT COMPOSE QUESTIONS USING ONLY THE PROVIDED resume_context, RETURN {{"questions": []}} EXACTLY. DO NOT INVENT.**
 
 Generate the questions now:"""
 
@@ -457,31 +462,37 @@ def create_structured_resume_context(resume_data: dict) -> dict:
         "has_achievements": False
     }
     
-    # Extract companies with exact names
+    # Extract companies with exact names - support multiple key names
     companies = []
-    for exp in resume_data.get("experience", []):
-        if exp.get("company"):
+    experience_list = resume_data.get("experience") or []
+    for exp in experience_list:
+        company_name = (exp.get("company") or exp.get("company_name")
+                        or exp.get("key") or exp.get("employer") or "")
+        role = exp.get("role") or exp.get("position") or ""
+        if company_name:
             companies.append({
-                "company_name": exp.get("company"),
-                "role": exp.get("role", "Unknown Role"),
-                "technologies": exp.get("technologies_used", []),
-                "start_date": exp.get("start_date", ""),
-                "end_date": exp.get("end_date", "Present")
+                "company_name": company_name.strip(),
+                "role": role.strip(),
+                "technologies": exp.get("technologies_used", []) or exp.get("technologies", []),
+                "start_date": exp.get("start_date", "") or exp.get("start", ""),
+                "end_date": exp.get("end_date", "") or exp.get("end", "Present")
             })
     
     if companies:
         context["companies"] = companies
         context["has_experience"] = True
     
-    # Extract projects with exact titles
+    # Extract projects with exact titles - tolerate title/name variations
     projects = []
-    for proj in resume_data.get("projects", []):
-        if proj.get("title"):
+    projects_list = resume_data.get("projects") or []
+    for proj in projects_list:
+        title = proj.get("title") or proj.get("project_title") or proj.get("name")
+        if title:
             projects.append({
-                "project_title": proj.get("title"),
-                "description": proj.get("description", "")[:100],  # Truncate long descriptions
-                "technologies": proj.get("technologies", []),
-                "role": proj.get("role", "")
+                "project_title": title.strip(),
+                "description": (proj.get("description") or "")[:200],
+                "technologies": proj.get("technologies") or proj.get("technologies_used") or [],
+                "role": proj.get("role") or ""
             })
     
     if projects:
@@ -490,7 +501,8 @@ def create_structured_resume_context(resume_data: dict) -> dict:
     
     # Extract education
     education = []
-    for edu in resume_data.get("education", []):
+    education_list = resume_data.get("education") or []
+    for edu in education_list:
         if edu.get("institution"):
             education.append({
                 "institution": edu.get("institution"),
@@ -503,7 +515,8 @@ def create_structured_resume_context(resume_data: dict) -> dict:
     
     # Extract certifications
     certifications = []
-    for cert in resume_data.get("certifications", []):
+    certifications_list = resume_data.get("certifications") or []
+    for cert in certifications_list:
         if cert.get("name"):
             certifications.append({
                 "name": cert.get("name"),
@@ -515,84 +528,52 @@ def create_structured_resume_context(resume_data: dict) -> dict:
         context["has_certifications"] = True
     
     # Extract achievements
-    achievements = resume_data.get("achievements", [])
+    achievements = resume_data.get("achievements") or []
     if achievements:
         context["achievements"] = achievements[:3]  # Top 3
         context["has_achievements"] = True
     
     # Extract skills (for context)
-    skills = resume_data.get("skills", {})
+    skills = resume_data.get("skills") or {}
     all_skills = []
-    for category, items in skills.items():
-        if items and isinstance(items, list):
-            all_skills.extend(items)
+    if skills and isinstance(skills, dict):
+        for category, items in skills.items():
+            if items and isinstance(items, list):
+                all_skills.extend(items)
     
     if all_skills:
         context["key_skills"] = all_skills[:10]  # Top 10 skills
     
     return context
 
-def create_resume_summary(resume_data: dict) -> str:
-    """Legacy function - kept for backward compatibility"""
-    parts = []
-    
-    # Personal info
-    personal = resume_data.get("personal_info", {})
-    name = personal.get("name", "Candidate")
-    parts.append(f"CANDIDATE: {name}\n")
-    
-    # Experience
-    experience = resume_data.get("experience", [])
-    if experience:
-        parts.append("\nPROFESSIONAL EXPERIENCE:")
-        for exp in experience:
-            role = exp.get("role", "")
-            company = exp.get("company", "")
-            parts.append(f"  • {role} at {company}")
-    
-    # Projects
-    projects = resume_data.get("projects", [])
-    if projects:
-        parts.append("\nPROJECTS:")
-        for proj in projects:
-            title = proj.get("title", "Project")
-            description = proj.get("description", "")
-            parts.append(f"  • {title}")
-            if description:
-                parts.append(f"    Description: {description[:150]}")
-            
-            techs = proj.get("technologies", [])
-            if techs:
-                parts.append(f"    Tech Stack: {', '.join(techs)}")
-            
-            challenges = proj.get("challenges_solved", [])
-            if challenges:
-                parts.append(f"    Challenge Solved: {challenges[0]}")
-    
-    # Skills
-    skills = resume_data.get("skills", {})
-    if skills:
-        parts.append("\nTECHNICAL SKILLS:")
-        for category, items in skills.items():
-            if items and isinstance(items, list):
-                parts.append(f"  {category.replace('_', ' ').title()}: {', '.join(items)}")
-    
-    # Achievements
-    achievements = resume_data.get("achievements", [])
-    if achievements:
-        parts.append(f"\nACHIEVEMENTS: {', '.join(achievements[:3])}")
-    
-    # Certifications
-    certifications = resume_data.get("certifications", [])
-    if certifications:
-        parts.append("\nCERTIFICATIONS:")
-        for cert in certifications:
-            name = cert.get("name", "")
-            issuer = cert.get("issuer", "")
-            if name:
-                parts.append(f"  • {name}" + (f" by {issuer}" if issuer else ""))
-    
-    return "\n".join(parts)
+def fill_placeholders_or_drop(q_text: str, resume_context: dict) -> Optional[str]:
+    """Replace bracketed placeholders with resume values or return None if unavailable."""
+    matches = PLACEHOLDER_RE.findall(q_text)
+    out = q_text
+    for m in matches:
+        token = m.strip().lower()
+        repl = None
+        if "company" in token:
+            companies = resume_context.get("companies", [])
+            if companies:
+                repl = companies[0].get("company_name")
+        elif "project" in token or "project name" in token:
+            projects = resume_context.get("projects", [])
+            if projects:
+                repl = projects[0].get("project_title")
+        elif "certification" in token:
+            certs = resume_context.get("certifications", [])
+            if certs:
+                repl = certs[0].get("name")
+        elif "institution" in token or "university" in token or "college" in token:
+            education = resume_context.get("education", [])
+            if education:
+                repl = education[0].get("institution")
+        # If we can't find a replacement, return None to drop this question
+        if not repl:
+            return None
+        out = out.replace(f"[{m}]", repl)
+    return out
 
 def validate_questions_against_resume(questions: List[dict], resume_context: dict) -> List[dict]:
     """Strict validation: questions must reference actual resume content.
@@ -622,10 +603,12 @@ def validate_questions_against_resume(questions: List[dict], resume_context: dic
         is_valid = True
         failure_reason = None
         
-        # Always keep introduction question
+        # Validate question 1 (introduction) - don't auto-accept
         if i == 0:
-            validated.append(q)
-            continue
+            if not (q.get("id") == 1 or q.get("category") == "introduction"):
+                is_valid = False
+                failure_reason = "First question must be the canonical introduction (id==1 or category=='introduction')"
+            # Still run subsequent checks for placeholders/hallucination
         
         # Check for placeholders
         if '[' in q.get("question", "") and ']' in q.get("question", ""):
@@ -665,6 +648,100 @@ def validate_questions_against_resume(questions: List[dict], resume_context: dic
     
     return validated
 
+def deterministic_questions_from_context(ctx: dict, total: int = 7) -> List[dict]:
+    """Generate questions deterministically from resume context without LLM.
+    This is a 100% resume-grounded fallback when LLM fails or produces insufficient questions."""
+    qlist = []
+    
+    # Always start with canonical introduction
+    qlist.append({
+        "id": 1,
+        "question": "Tell me about yourself — your background, education, any experience you have, and projects you've worked on. Feel free to share any interests or hobbies as well.",
+        "category": "introduction",
+        "expected_topics": ["background", "education", "experience", "projects", "interests"],
+        "context": "Opening introduction"
+    })
+    
+    nid = 2
+    
+    # Experience-first (if present)
+    if ctx.get("has_experience"):
+        for comp in ctx.get("companies", [])[:3]:
+            qlist.append({
+                "id": nid,
+                "question": f"Can you describe your role as {comp.get('role', '')} at {comp['company_name']} and your main responsibilities?",
+                "category": "experience",
+                "expected_topics": ["role", "responsibilities", comp["company_name"]],
+                "context": f"Asked about {comp['company_name']}"
+            })
+            nid += 1
+            if len(qlist) >= total:
+                break
+    
+    # Projects
+    if len(qlist) < total and ctx.get("has_projects"):
+        for proj in ctx.get("projects", [])[:3]:
+            qlist.append({
+                "id": nid,
+                "question": f"Walk me through the project '{proj['project_title']}': your role, key technical choices, and main challenges.",
+                "category": "project",
+                "expected_topics": ["project", proj["project_title"], "technical choices"],
+                "context": f"Asked about {proj['project_title']}"
+            })
+            nid += 1
+            if len(qlist) >= total:
+                break
+    
+    # Certifications / achievements next
+    if len(qlist) < total and ctx.get("has_certifications"):
+        cert = ctx.get("certifications", [])[0]
+        qlist.append({
+            "id": nid,
+            "question": f"You have the '{cert['name']}' certification. Why did you pursue it and how have you applied it?",
+            "category": "certification",
+            "expected_topics": ["certification", cert["name"]],
+            "context": f"Asked about {cert['name']}"
+        })
+        nid += 1
+    
+    # Achievements
+    if len(qlist) < total and ctx.get("has_achievements"):
+        achievements = ctx.get("achievements", [])
+        if achievements:
+            qlist.append({
+                "id": nid,
+                "question": f"You mentioned achieving '{achievements[0]}'. Can you elaborate on that?",
+                "category": "achievement",
+                "expected_topics": ["achievement", "accomplishment"],
+                "context": "Asked about listed achievement"
+            })
+            nid += 1
+    
+    # Education-based questions if needed
+    if len(qlist) < total and ctx.get("education"):
+        edu = ctx.get("education", [])[0]
+        qlist.append({
+            "id": nid,
+            "question": f"Tell me about your time at {edu['institution']} and what you studied.",
+            "category": "education",
+            "expected_topics": ["education", edu["institution"], "studies"],
+            "context": f"Asked about {edu['institution']}"
+        })
+        nid += 1
+    
+    # Pad with skills-based questions if still short
+    while len(qlist) < total:
+        qlist.append({
+            "id": nid,
+            "question": "What are your key technical strengths and which tools/technologies are you most comfortable using?",
+            "category": "skills",
+            "expected_topics": ["skills", "tools", "technologies"],
+            "context": "General skills question"
+        })
+        nid += 1
+    
+    return qlist[:total]
+
 def is_answer_valid(answer: str) -> bool:
     """Check if answer is meaningful"""
     if not answer or len(answer.strip()) < 10:
@@ -682,11 +759,12 @@ def is_answer_valid(answer: str) -> bool:
 @app.get("/")
 async def root():
     return {
-        "message": "Resume-Based Natural Interview System v3.0",
+        "message": "Resume-Based Natural Interview System v3.1 (Fixed)",
         "endpoints": {
             "parse_resume": "/parse-resume",
             "generate_questions": "/generate-questions",
             "score_answers": "/score-answers",
+            "debug_questions": "/debug-questions",
             "health": "/health"
         }
     }
@@ -738,7 +816,7 @@ async def parse_resume(file: UploadFile = File(...)):
 
 @app.post("/generate-questions", response_model=InterviewQuestionSet)
 async def generate_questions(resume_data: EnhancedResumeOutput):
-    """Generate natural interview questions based purely on resume"""
+    """Generate natural interview questions based purely on resume using structured approach"""
     if not GROQ_API_KEY:
         raise HTTPException(status_code=500, detail="GROQ_API_KEY not configured")
     
@@ -768,11 +846,11 @@ async def generate_questions(resume_data: EnhancedResumeOutput):
             has_achievements=resume_context.get('has_achievements')
         )
         
-        # Use larger model with lower temperature
+        # Use larger model with zero temperature for deterministic output
         llm = ChatGroq(
             api_key=GROQ_API_KEY,
-            model="llama-3.1-70b-versatile",  # Larger model for better reasoning
-            temperature=0.1,  # Very low temperature to minimize hallucination
+            model="llama-3.3-70b-versatile",  # Larger model for better reasoning
+            temperature=0.0,  # Zero temperature for maximum determinism
             model_kwargs={"response_format": {"type": "json_object"}}
         )
         
@@ -781,61 +859,75 @@ async def generate_questions(resume_data: EnhancedResumeOutput):
         
         questions = questions_data.get("questions", [])
         
-        # Log the raw generated questions for debugging
-        logger.info(f"🤖 RAW QUESTIONS GENERATED BY LLM:")
+        logger.info(f"🤖 RAW QUESTIONS GENERATED:")
         for i, q in enumerate(questions):
-            logger.info(f"Q{i+1}: {q.get('question', 'NO QUESTION')}")
+            logger.info(f"Q{i+1}: {q.get('question')}")
+        
+        # Fill placeholders or drop questions with unfillable placeholders
+        processed_questions = []
+        for i, q in enumerate(questions):
+            original_text = q.get("question", "")
+            if '[' in original_text and ']' in original_text:
+                filled_text = fill_placeholders_or_drop(original_text, resume_context)
+                if filled_text is None:
+                    logger.warning(f"⚠️ Dropping question {i+1} with unfillable placeholder: {original_text}")
+                    continue
+                q["question"] = filled_text
+                logger.info(f"✏️ Filled placeholder in Q{i+1}: {filled_text}")
+            processed_questions.append(q)
         
         # Strict validation against resume context
-        questions = validate_questions_against_resume(questions, resume_context)
+        validated_questions = validate_questions_against_resume(processed_questions, resume_context)
         
-        logger.info(f"✅ VALIDATED QUESTIONS ({len(questions)} remaining):")
-        for i, q in enumerate(questions):
-            logger.info(f"Q{i+1}: {q.get('question', 'NO QUESTION')}")
+        logger.info(f"✅ VALIDATED QUESTIONS ({len(validated_questions)}/7):")
+        for i, q in enumerate(validated_questions):
+            logger.info(f"Q{i+1}: {q.get('question')}")
         
-        # Validate and fix each question
-        for i, q in enumerate(questions):
-            if "expected_topics" not in q or not q["expected_topics"]:
-                q["expected_topics"] = ["general"]
-            if "category" not in q:
-                q["category"] = "general"
-            if "context" not in q:
-                q["context"] = "Resume-based question"
-        
-        # Ensure first question is introduction
-        if questions:
-            questions[0] = {
-                "id": 1,
-                "question": "Tell me about yourself — your background, education, any experience you have, and projects you've worked on. Feel free to share any interests or hobbies as well.",
-                "category": "introduction",
-                "expected_topics": ["background", "education", "experience", "projects", "interests"],
-                "context": "Opening introduction"
-            }
-        
-        # If we lost too many questions, log warning and add fallbacks
-        if len(questions) < 5:
-            logger.error(f"⚠️ Only {len(questions)} valid questions! This is a problem.")
-            logger.error(f"Resume context had: experience={resume_context.get('has_experience')}, "
-                        f"projects={resume_context.get('has_projects')}")
-        
-        # If we have fewer than 7, pad with general questions (last resort)
-        while len(questions) < 7:
-            next_id = len(questions) + 1
-            questions.append({
-                "id": next_id,
-                "question": f"What are your key strengths as a professional?",
-                "category": "general",
-                "expected_topics": ["strengths", "skills"],
-                "context": "General question due to limited resume content"
-            })
-            logger.warning(f"Added fallback question {next_id}")
-        
-        logger.info(f"✅ Successfully generated {len(questions[:7])} questions")
+        # If we lost too many questions, use deterministic fallback
+        if len(validated_questions) < 5:
+            logger.warning(f"⚠️ Only {len(validated_questions)} valid questions from LLM! Using deterministic fallback.")
+            logger.warning(f"Resume context had: experience={resume_context.get('has_experience')}, "
+                          f"projects={resume_context.get('has_projects')}")
+            validated_questions = deterministic_questions_from_context(resume_context, total=7)
+            logger.info(f"✅ Generated {len(validated_questions)} deterministic questions from resume context")
+        else:
+            # Ensure introduction question is first
+            if validated_questions and validated_questions[0].get("id") != 1:
+                canonical_intro = {
+                    "id": 1,
+                    "question": "Tell me about yourself — your background, education, any experience you have, and projects you've worked on. Feel free to share any interests or hobbies as well.",
+                    "category": "introduction",
+                    "expected_topics": ["background", "education", "experience", "projects", "interests"],
+                    "context": "Opening introduction"
+                }
+                # Check if first question is a valid intro
+                if validated_questions[0].get("category") != "introduction":
+                    validated_questions.insert(0, canonical_intro)
+                    logger.info("Inserted canonical introduction at the beginning")
+                else:
+                    validated_questions[0] = canonical_intro
+            elif not validated_questions:
+                # Empty list - use deterministic fallback
+                validated_questions = deterministic_questions_from_context(resume_context, total=7)
+                logger.info(f"✅ No validated questions - used deterministic fallback")
+            
+            # Ensure exactly 7 questions
+            if len(validated_questions) < 7:
+                # Use deterministic generator to fill remaining
+                full_set = deterministic_questions_from_context(resume_context, total=7)
+                # Keep validated questions and fill from deterministic set
+                existing_ids = {q.get("id") for q in validated_questions}
+                for q in full_set:
+                    if len(validated_questions) >= 7:
+                        break
+                    if q.get("id") not in existing_ids:
+                        validated_questions.append(q)
+                        logger.info(f"Added deterministic question: {q.get('question')[:50]}...")
         
         return InterviewQuestionSet(
             candidate_name=candidate_name,
-            questions=questions[:7],  # Take first 7
-            total_questions=len(questions[:7])
+            questions=validated_questions[:7],
+            total_questions=len(validated_questions[:7])
         )
         
     except HTTPException:
@@ -843,6 +935,33 @@ async def generate_questions(resume_data: EnhancedResumeOutput):
     except Exception as e:
         logger.error(f"Error generating questions: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+
+@app.post("/debug-questions")
+async def debug_question_generation(resume_data: EnhancedResumeOutput):
+    """Debug endpoint to test question generation with detailed logging"""
+    try:
+        candidate_name = resume_data.personal_info.name or "Test Candidate"
+        resume_context = create_structured_resume_context(resume_data.model_dump())
+        
+        return {
+            "candidate_name": candidate_name,
+            "structured_resume_context": resume_context,
+            "resume_data_keys": list(resume_data.model_dump().keys()),
+            "experience_count": len(resume_data.experience or []),
+            "project_count": len(resume_data.projects or []),
+            "education_count": len(resume_data.education or []),
+            "actual_companies": [exp.company for exp in (resume_data.experience or []) if exp.company],
+            "actual_projects": [proj.title for proj in (resume_data.projects or []) if proj.title],
+            "actual_institutions": [edu.institution for edu in (resume_data.education or []) if edu.institution],
+            "has_flags": {
+                "has_experience": resume_context.get('has_experience'),
+                "has_projects": resume_context.get('has_projects'),
+                "has_certifications": resume_context.get('has_certifications'),
+                "has_achievements": resume_context.get('has_achievements')
+            }
+        }
+    except Exception as e:
+        return {"error": str(e)}
 
 @app.post("/score-answers", response_model=ScoringOutput)
 async def score_answers(scoring_input: ScoringInput):
@@ -976,41 +1095,21 @@ async def score_answers(scoring_input: ScoringInput):
         logger.error(f"Error scoring answers: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
 
-@app.post("/debug-questions")
-async def debug_question_generation(resume_data: EnhancedResumeOutput):
-    """Debug endpoint to test question generation with detailed logging"""
-    try:
-        candidate_name = resume_data.personal_info.name or "Test Candidate"
-        resume_summary = create_resume_summary(resume_data.model_dump())
-        
-        return {
-            "candidate_name": candidate_name,
-            "resume_summary": resume_summary,
-            "resume_data_keys": list(resume_data.model_dump().keys()),
-            "experience_count": len(resume_data.experience or []),
-            "project_count": len(resume_data.projects or []),
-            "education_count": len(resume_data.education or []),
-            "actual_companies": [exp.company for exp in (resume_data.experience or []) if exp.company],
-            "actual_projects": [proj.title for proj in (resume_data.projects or []) if proj.title],
-            "actual_institutions": [edu.institution for edu in (resume_data.education or []) if edu.institution]
-        }
-    except Exception as e:
-        return {"error": str(e)}
-
 @app.get("/health")
 async def health_check():
     return {
         "status": "healthy",
-        "version": "3.0.1",
+        "version": "3.1.0",
         "groq_configured": bool(GROQ_API_KEY),
         "features": [
             "Resume parsing with null for missing fields",
-            "Natural resume-based questions (no difficulty levels)",
+            "Structured question generation (eliminates hallucination)",
             "Answer scoring with detailed feedback",
             "No technology bias - purely resume-driven",
-            "Question validation to ensure resume-based content",
-            "Hallucination detection and filtering",
-            "Debug endpoint for troubleshooting"
+            "Enhanced validation with hallucination detection",
+            "Debug endpoint for troubleshooting",
+            "Lower temperature (0.1) for more deterministic results",
+            "70B model for better reasoning"
         ]
     }
 
